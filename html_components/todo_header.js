@@ -1,5 +1,6 @@
+import { storage } from "../storage/store.js"
 // main title and input
-export const todo_header=        {
+export const todo_header = {
     "tag": "header",
     "attrs": {
         "class": "header",
@@ -18,6 +19,9 @@ export const todo_header=        {
                 "class": "new-todo",
                 "placeholder": "What needs to be done?",
                 "autofocus": "true",
+            },
+            "property": {
+                "onkeyup": storage["insert"],
             },
         },
     ]

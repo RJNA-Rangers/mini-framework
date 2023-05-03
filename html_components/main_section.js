@@ -1,5 +1,6 @@
+import { storage } from "../storage/store.js"
 // main section
-export const main_section={
+export const main_section = {
     "tag": "section",
     "attrs": {
         "class": "main",
@@ -26,6 +27,7 @@ export const main_section={
             "attrs": {
                 "class": "todo-list",
             },
+            "children": storage["get"]()
         },
     ]
 }
