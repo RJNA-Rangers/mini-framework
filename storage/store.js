@@ -30,7 +30,6 @@ export const storage = {
                                 "checked": todo.completed,
                                 "onclick": function (evt) {
                                     let [node, index, _] = nodeIndex(evt)
-                                    // console.log({ evt })
                                     allEntries[index].completed = !allEntries[index].completed
                                     localStorage.setItem("todo_list", JSON.stringify(allEntries))
                                     if (allEntries[index].completed) {
@@ -111,12 +110,12 @@ export const storage = {
 
     },
     "complete-all": function () {
-
+        
     },
     "clear-completed": function () {
         Array.from(document.querySelectorAll(".completed")).forEach(completedNode => {
             let allEntries = JSON.parse(localStorage.getItem("todo_list")) || [];
-            const index=allEntries.findIndex(todo => todo.id === completedNode.dataset.id)
+            const index = allEntries.findIndex(todo => todo.id === completedNode.dataset.id)
             allEntries.splice(index, 1)
             localStorage.setItem("todo_list", JSON.stringify(allEntries))
             completedNode.remove()
@@ -135,8 +134,6 @@ function nodeIndex(evt) {
 
 function taskCompleted(todo) {
     if (todo.completed) {
-        return "toggle completed"
-    } else {
-        return "toggle"
+        return "completed"
     }
 }

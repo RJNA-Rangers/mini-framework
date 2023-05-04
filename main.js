@@ -19,7 +19,6 @@ const section =
 export function createNode(obj) {
     const result = document.createElement(obj.tag);
 
-
     if (obj.children) {
         for (const child of obj.children) {
             result.appendChild(createNode(child));
@@ -46,7 +45,7 @@ function text(input) {
 }
 
 window.onload = () => {
-    console.log(document.body.appendChild(createNode(section)))
     storage.store
+    console.log(document.body.appendChild(createNode(section)))
 }
 
