@@ -1,11 +1,14 @@
 import RJ from '../rjna/engine.js';
 
+// Define a HelloWorld component using the RJComponent base class
 class HelloWorld extends RJ.Component {
-  create() {
-    return RJ.createElement('div', {}, 'Hello, World!');
+  render() {
+    // Use the rj helper function to create a more user-friendly syntax
+    return RJ.rj`<div>Hello, World!</div>`;
   }
 }
 
-const app = new HelloWorld().create();
+// Create an instance of the HelloWorld component and render it
+const app = new HelloWorld().render();
 const root = document.getElementById('root');
 RJ.render(app, root);
