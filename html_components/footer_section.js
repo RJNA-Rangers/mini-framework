@@ -1,3 +1,5 @@
+import { storage } from "../storage/store.js"
+
  const todo_counter={
     "tag": "span",
     "attrs": {
@@ -27,6 +29,9 @@ const todo_clear_completed={
             "tag": "a",
             "attrs": {
                 "textContent": "Clear Completed"
+            },
+            "property":{
+                "onclick":storage["clear-completed"]
             }
         }
 

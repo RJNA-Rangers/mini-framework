@@ -11,7 +11,7 @@ export const storage = {
             todo_arr.push({
                 "tag": "li",
                 "attrs": {
-                    // "class": todo.completed,
+                    "class": taskCompleted(todo),
                     "data-id": todo.id,
                 },
                 "children": [{
@@ -27,9 +27,10 @@ export const storage = {
                                 "type": "checkbox",
                             },
                             "property": {
+                                "checked": todo.completed,
                                 "onclick": function (evt) {
                                     let [node, index, _] = nodeIndex(evt)
-                                    console.log({ index })
+                                    // console.log({ evt })
                                     allEntries[index].completed = !allEntries[index].completed
                                     localStorage.setItem("todo_list", JSON.stringify(allEntries))
                                     if (allEntries[index].completed) {
@@ -49,9 +50,6 @@ export const storage = {
                             },
                             "property": {
                                 "ondblclick": storage["edit"],
-                                "onkeyup": function () {
-
-                                }
                             }
                         },
                         {
@@ -75,17 +73,13 @@ export const storage = {
     },
     "insert": function (evt) {
         if (evt.key == "Enter" || evt.key == 13) {
-            console.log("pressed", evt.target.value)
             if (evt.target.value != "") {
-
                 const new_todo_obj = {
                     id: Date.now().toString(36) + Math.random().toString(36).substr(2),
                     content: evt.target.value,
                     date: Date.now(),
                     completed: false,
                 }
-
-
                 let allEntries = JSON.parse(localStorage.getItem("todo_list")) || [];
                 allEntries.push(new_todo_obj);
                 localStorage.setItem("todo_list", JSON.stringify(allEntries))
@@ -116,15 +110,33 @@ export const storage = {
         node.remove()
 
     },
-    // "update":function update(){
+    "complete-all": function () {
 
-    // }
+    },
+    "clear-completed": function () {
+        Array.from(document.querySelectorAll(".completed")).forEach(completedNode => {
+            let allEntries = JSON.parse(localStorage.getItem("todo_list")) || [];
+            const index=allEntries.findIndex(todo => todo.id === completedNode.dataset.id)
+            allEntries.splice(index, 1)
+            localStorage.setItem("todo_list", JSON.stringify(allEntries))
+            completedNode.remove()
+            console.log({ completedNode })
+        })
+    }
 }
 
 function nodeIndex(evt) {
     let node = evt.target.parentNode.parentNode
-    let id = node.attributes["data-id"].nodeValue
+    let id = node.dataset.id
     let allEntries = JSON.parse(localStorage.getItem("todo_list")) || [];
     let indexOfTodo = allEntries.findIndex(todo => todo.id === id)
     return [node, indexOfTodo, allEntries]
+}
+
+function taskCompleted(todo) {
+    if (todo.completed) {
+        return "toggle completed"
+    } else {
+        return "toggle"
+    }
 }
