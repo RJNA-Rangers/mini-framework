@@ -1,0 +1,3 @@
+import {hello} from "../rjna/engine.js";
+
+hello()
