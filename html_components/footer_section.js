@@ -1,104 +1,93 @@
+import tag from "../rjna/elements.js"
+import { completeAllTasks } from "../storage/functions.js"
 import { storage } from "../storage/store.js"
 
- const todo_counter={
-    "tag": "span",
-    "attrs": {
-        "class": "todo-count",
-        "textContent": " items left ",
-    },
-    "children": [
+const todo_counter =
+    tag.span(
         {
-            "tag": "strong",
-            "attrs": {
-                "textContent": "0",
+            class: "todo-count",
+            textContent: " items left ",
+        },
+        {},
+        {},
+        tag.strong(
+            {
+                textContent: 0,
                 // in the state management to see how many to-do 
                 // list
-            }
-        }
-    ]
-}
+            },
+        )
+    )
 
-const todo_clear_completed={
-    "tag": "button",
-    "attrs": {
-        "class":"clear-completed",
+const todo_clear_completed = tag.button(
+    {
+        class: "clear-completed",
         // "style":""
     },
-    "children": [
+    {},
+    {},
+    tag.a(
         {
-            "tag": "a",
-            "attrs": {
-                "textContent": "Clear Completed"
-            },
-            "property":{
-                "onclick":storage["clear-completed"]
-            }
-        }
-
-    ]
-
-}
-
-const footer_section_buttons=[{
-    "tag": "li",
-    "attrs": {},
-    "children": [
+            textContent: "Clear Completed"
+        },
         {
-            "tag": "a",
-            "attrs": {
-                "href": "#/",
-                "class": "selected",
-                "textContent": "All"
-            }
+            onclick: storage["clear-completed"](completeAllTasks)
         }
+    )
+)
 
-    ]
-},
-{
-    "tag": "li",
-    "attrs": {},
-    "children": [
+const todo_filters =
+    tag.ul(
         {
-            "tag": "a",
-            "attrs": {
-                "href": "#/active",
-                "textContent": "Active"
-            }
-        }
+            class: "filters",
+        },
+        {},
+        {},
+        tag.li(
+            {},
+            {},
+            {},
+            tag.a(
+                {
+                    href: "#/",
+                    class: "selected",
+                    textContent: "All"
+                }
+            )
+        ),
+        tag.li(
+            {},
+            {},
+            {},
+            tag.a(
+                {
+                    href: "#/active",
+                    textContent: "Active"
+                }
+            )
+        ),
+        tag.li(
+            {},
+            {},
+            {},
+            tag.a(
+                {
+                    href: "#/completed",
+                    textContent: "Completed"
+                }
+            )
+        )
+    )
 
-    ]
-},
-{
-    "tag": "li",
-    "attrs": {},
-    "children": [
+
+export const footer_section =
+    tag.footer(
         {
-            "tag": "a",
-            "attrs": {
-                "href": "#/completed",
-                "textContent": "Completed"
-            }
-        }
-
-    ]
-}]
-const todo_filters={
-    "tag": "ul",
-    "attrs": {
-        "class": "filters",
-    },
-    "children": footer_section_buttons
-}
-
-export const footer_section={
-    "tag": "footer",
-    "attrs": {
-        "class": "footer",
-        //    "style":""
-    },
-    "children": [
+            class: "footer",
+        },
+        {},
+        {},
         todo_counter,
         todo_filters,
         todo_clear_completed,
-    ]
-}
+    )

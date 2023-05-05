@@ -1,28 +1,25 @@
+import tag from "../rjna/elements.js"
+import { insertIntoLocalStorage } from "../storage/functions.js"
 import { storage } from "../storage/store.js"
 // main title and input
-export const todo_header = {
-    "tag": "header",
-    "attrs": {
-        "class": "header",
-    },
-    "children": [
-        {
-            "tag": "h1",
-            "attrs": {
-                "textContent": "todos"
-            },
 
+export const todo_header =tag.header(
+    {
+        class: "header",
+    },
+    {},
+    {},
+    tag.h1({
+        textContent: "todos"
+    }),
+    tag.input(
+        {
+            class: "new-todo",
+            placeholder: "What needs to be done?",
+            autofocus: "true",
         },
         {
-            "tag": "input",
-            "attrs": {
-                "class": "new-todo",
-                "placeholder": "What needs to be done?",
-                "autofocus": "true",
-            },
-            "property": {
-                "onkeyup": storage["insert"],
-            },
+            onkeyup: storage["insert"](insertIntoLocalStorage),
         },
-    ]
-}
+     )
+    )
