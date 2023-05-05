@@ -28,7 +28,6 @@ class RJComponent {
       }
     }
     if (element.props.children) {
-     
     for (const child of element.props.children) {
       render(child, domElement);
     }
@@ -82,7 +81,9 @@ class RJComponent {
     return convertToVirtualNode(domElement);
   }
   
-  
+  function insert(callback){
+    callback()
+  }
   
   const RJ = {
     Component: RJComponent,
