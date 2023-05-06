@@ -1,13 +1,14 @@
+
 function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}, ...children) {
     return {
         tag,
         "attrs": { ...attributes },
         "property": { ...eventHandlers, ...properties },
-        children
+        children,
     }
 }
 
- function createNode(obj) {
+ export function createNode(obj) {
     const result = document.createElement(obj.tag);
 
     if (obj.children) {

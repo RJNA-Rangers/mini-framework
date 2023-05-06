@@ -1,5 +1,6 @@
 import { storage } from "./store.js";
-import tag from "../rjna/elements.js";
+import {tag} from "../rjna/elements.js";
+import {createNode} from "../rjna/engine.js"
 export function createLocalStorage(){
         let allEntries = JSON.parse(localStorage.getItem("todo_list")) || []
         localStorage.setItem("todo_list", JSON.stringify(allEntries))

@@ -17,9 +17,58 @@ const htmlTags = [
   ];
 
 const tag={}
+const tagWithState= {}
+
+function createTagWithState(tagName) {
+  const subscribers = new Set();
+  let state = {};
+
+  const setState = (newState) => {
+    state = Object.assign({}, state, newState);
+    subscribers.forEach((subscriber) => subscriber());
+  };
+
+  const getState = () => state;
+
+  const render = () => {
+    const tagObj = {
+      tag: tagName,
+      attrs: {},
+      properties: {},
+      children: [],
+    };
+    const currentState = getState();
+    Object.keys(currentState).forEach((key) => {
+      const value = currentState[key];
+      if (typeof value === "function") {
+        tagObj.property[key] = value;
+      } else {
+        tagObj.attrs[key] = value;
+      }
+    });
+    return createNode(tagObj);
+  };
+
+  const subscribe = (subscriber) => subscribers.add(subscriber);
+  const unsubscribe = (subscriber) => subscribers.delete(subscriber);
+
+  return {
+    render,
+    setState,
+    getState,
+    subscribe,
+    unsubscribe,
+  };
+}
 
 htmlTags.forEach((tagName)=>{
     tag[tagName]=(attributes={}, eventHandlers={}, properties={}, ...children)=> RJNA.createElement(tagName, attributes, eventHandlers, properties, ...children)
+    tagWithState[tagName]=(attributes={}, eventHandlers={}, properties={}, ...children)=>{
+      return [RJNA.createElement(tagName, attributes,eventHandlers, properties, ...children), createTagWithState(tagName)]
+    }
 })
 
-export default tag
+export{
+  tag,
+  tagWithState,
+};

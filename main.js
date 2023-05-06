@@ -1,4 +1,4 @@
-import tag from "./rjna/elements.js"
+import {tag} from "./rjna/elements.js"
 import RJNA from "./rjna/engine.js";
 import { todo_header } from "./html_components/todo_header.js";
 import { main_section } from "./html_components/main_section.js";

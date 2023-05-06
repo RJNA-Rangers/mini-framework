@@ -1,23 +1,27 @@
-import tag from "../rjna/elements.js"
+import {tag, tagWithState} from "../rjna/elements.js"
 import { completeAllTasks } from "../storage/functions.js"
 import { storage } from "../storage/store.js"
 
-const todo_counter =
-    tag.span(
-        {
-            class: "todo-count",
-            textContent: " items left ",
-        },
-        {},
-        {},
-        tag.strong(
-            {
-                textContent: 0,
-                // in the state management to see how many to-do 
-                // list
-            },
-        )
-    )
+
+const [todo_counter, state] = tagWithState.span(
+    {
+        class: "todo-count",
+        textContent: " items left ",
+    },
+    {},
+    {},
+);
+state.setState({count:5})
+todo_counter.children = [
+    tag.strong({textContent: `${state.getState().count}`}),
+    
+];
+// render,
+// setState,
+// getState,
+// subscribe,
+// unsubscribe,
+            
 
 const todo_clear_completed = tag.button(
     {

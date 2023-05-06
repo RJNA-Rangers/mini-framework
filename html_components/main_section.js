@@ -1,6 +1,6 @@
 import { storage } from "../storage/store.js"
 import { getFromLocalStorage } from "../storage/functions.js"
-import tag from "../rjna/elements.js"
+import {tag } from "../rjna/elements.js"
 // main section
 export const main_section = tag.section(
     { class: "main" },
