@@ -8,14 +8,8 @@ function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}
     }
 }
 
- export function createNode(obj) {
+export function createNode(obj) {
     const result = document.createElement(obj.tag);
-
-    if (obj.children) {
-        for (const child of obj.children) {
-            result.appendChild(createNode(child));
-        }
-    }
 
     for (const [key, value] of Object.entries(obj.attrs)) {
         if (key == "textContent") {
@@ -24,6 +18,18 @@ function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}
             result.setAttribute(key, value);
         }
     }
+
+    if (obj.children) {
+        for (const child of obj.children) {
+            if (typeof child == "string") {
+                result.appendChild(text(child))
+            } else {
+
+                result.appendChild(createNode(child));
+            }
+        }
+    }
+
     if (obj.property) {
         for (const [key, value] of Object.entries(obj.property)) {
             result[key] = value
@@ -33,18 +39,18 @@ function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}
     return result;
 }
 
-function text(input) {
+export function text(input) {
     return document.createTextNode(input)
 }
 
-function render(child,parent){
+function appendElement(child, parent) {
     parent.appendChild(child)
 }
 
 const RJNA = {
     createElement,
     createNode,
-    render
-  };
-  
-  export default RJNA
+    appendElement
+};
+
+export default RJNA

@@ -1,9 +1,8 @@
-import {tag } from "../rjna/elements.js"
+import { tag } from "../rjna/elements.js"
 import { insertIntoLocalStorage } from "../storage/functions.js"
-import { storage } from "../storage/store.js"
 // main title and input
 
-export const todo_header =tag.header(
+export const todo_header = tag.header(
     {
         class: "header",
     },
@@ -19,7 +18,7 @@ export const todo_header =tag.header(
             autofocus: "true",
         },
         {
-            onkeyup: storage["insert"](insertIntoLocalStorage),
+            onkeyup: (evt) => insertIntoLocalStorage(evt),
         },
-     )
+    )
 )

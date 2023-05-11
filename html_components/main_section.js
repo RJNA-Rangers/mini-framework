@@ -1,6 +1,5 @@
-import { storage } from "../storage/store.js"
-import { getFromLocalStorage } from "../storage/functions.js"
-import {tag } from "../rjna/elements.js"
+import { getFromLocalStorage, toggleAll } from "../storage/functions.js"
+import { tag } from "../rjna/elements.js"
 // main section
 export const main_section = tag.section(
     { class: "main" },
@@ -11,7 +10,8 @@ export const main_section = tag.section(
             type: "checkbox",
             class: "toggle-all",
             id: "toggle-all"
-        }
+        },
+        { onclick: (evt) => toggleAll(evt) }
     ),
     tag.label(
         {
@@ -20,9 +20,9 @@ export const main_section = tag.section(
         }
     ),
     tag.ul(
-        {class:"todo-list"},
+        { class: "todo-list" },
         {},
         {},
-        ...storage["get"](getFromLocalStorage)
+        ...getFromLocalStorage()
     )
 )
