@@ -13,22 +13,22 @@ export const footerInfo = tag.footer(
         tag.a(
             {
                 href: "#",
-                textContent: "Remington Smith"
+                textContent: " Remington Smith "
             }
         ),
         tag.a(
             {
                 href: "#",
-                textContent: "Jason Asante"
+                textContent: " Jason Asante "
             }
         ),
         tag.a({
             href: "#",
-            textContent: "Nikolo Don"
+            textContent: " Nik Don "
         }),
         tag.a({
             href: "#",
-            textContent: "Abd Al-Raheem Khan"
+            textContent: " Abd Al-Raheem Khan "
         }),
     ),
     tag.p(

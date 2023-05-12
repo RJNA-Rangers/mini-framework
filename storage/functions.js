@@ -3,7 +3,7 @@ import RJNA, { createNode } from "../rjna/engine.js"
 import { updateCount } from "../html_components/footer_section.js";
 export function getFromLocalStorage() {
 
-    const allEntries = orbital.todo || ['ok'];
+    const allEntries = orbital.todo || [];
     let todo_arr = []
     allEntries.forEach(todo =>
         todo_arr.push(
@@ -34,6 +34,7 @@ export function getFromLocalStorage() {
                                 } else {
                                     node.className = ""
                                 }
+                                updateCount();
                             }
                         },
                         {
@@ -116,11 +117,16 @@ export function editLabelInStorage(evt1) {
         }
     }
     window.onclick = (evt) => {
-        if (evt.target.className == "edit")
+        if (evt.target.className == "edit") {
             return;
-        if (text !== "") {
+        }
+
+        if (text !== "" && text != evt1.target.innerHTML) {
+            console.log(orbital.todo[index].content)
             orbital.todo[index].content = text;
             evt1.target.innerHTML = text;
+            node.classList.remove("editing");
+        } else if (text != "" && text == evt1.target.innerHTML) {
             node.classList.remove("editing");
         } else {
             removeFromLocalStorage(evt1)
@@ -186,7 +192,6 @@ export function toggleAll() {
     }
 
     // if (Array.from(document.querySelectorAll(".completed")).length!=)
-
-
+    updateCount();
 }
 

@@ -1,8 +1,12 @@
 import { getFromLocalStorage, toggleAll } from "../storage/functions.js"
 import { tag } from "../rjna/elements.js"
 // main section
+let style = "display: block;";
+if (orbital.todo.length <= 0){
+    style = "display: none;"
+}
 export const main_section = tag.section(
-    { class: "main" },
+    { class: "main", style:`${style}`},
     {},
     {},
     tag.input(
