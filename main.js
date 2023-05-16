@@ -5,15 +5,31 @@ import { main_section } from "./html_components/main_section.js";
 import { footer_section } from "./html_components/footer_section.js";
 import { footerInfo } from "./html_components/footer_info.js";
 
-window.onload = () => {
-    const sectionObj = tag.section({
+export let sectionObj = tag.section({
+    "class": "todoapp",
+}, {}, {}, todo_header,
+    main_section(orbital.todo),
+    footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
+)
+export function changeSectionObj(newObj){
+    sectionObj=newObj
+}
+
+export let rootEl
+export function changeRootEl(newNode){
+    rootEl=newNode
+}
+export function createTodo(){
+    return tag.section({
         "class": "todoapp",
     }, {}, {}, todo_header,
-        main_section,
-        footer_section,
+        main_section(orbital.todo),
+        footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
     )
-
-    document.body.appendChild(RJNA.createNode(sectionObj));
+}
+window.onload = () => {
+    rootEl=RJNA.createNode(sectionObj)
+    document.body.appendChild(rootEl);
     document.body.appendChild(RJNA.createNode(footerInfo))
 
 }

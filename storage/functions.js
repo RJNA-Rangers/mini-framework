@@ -1,15 +1,94 @@
 import { tag } from "../rjna/elements.js";
 import RJNA, { createNode } from "../rjna/engine.js"
-import { updateCount } from "../html_components/footer_section.js";
-export function getFromLocalStorage() {
+import { footer_section, updateCount } from "../html_components/footer_section.js";
+import { todo_header } from "../html_components/todo_header.js";
+import { main_section } from "../html_components/main_section.js";
+import diff from "../rjna/diff.js";
+import { sectionObj, changeSectionObj, rootEl, changeRootEl } from "../main.js";
 
-    const allEntries = orbital.todo || [];
+function deepEqual(obj1, obj2, path = '') {
+    // Check if the objects are of the same type
+    if (typeof obj1 !== typeof obj2) {
+      console.log(`Type mismatch at path: ${path}`);
+      console.log(`Value 1: ${obj1}`);
+      console.log(`Value 2: ${obj2}`);
+      return false;
+    }
+  
+    // Check if both objects are arrays
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      // Compare the lengths of the arrays
+      if (obj1.length !== obj2.length) {
+        console.log(`Array length mismatch at path: ${path}`);
+        console.log(`Length 1: ${obj1.length}`);
+        console.log(`Length 2: ${obj2.length}`);
+        return false;
+      }
+  
+      // Compare each element in the arrays
+      for (let i = 0; i < obj1.length; i++) {
+        if (!deepEqual(obj1[i], obj2[i], `${path}[${i}]`)) {
+          return false;
+        }
+      }
+  
+      return true;
+    }
+  
+    // Check if both objects are objects (non-array objects)
+    if (
+      typeof obj1 === 'object' &&
+      obj1 !== null &&
+      !Array.isArray(obj1) &&
+      typeof obj2 === 'object' &&
+      obj2 !== null &&
+      !Array.isArray(obj2)
+    ) {
+      // Get the keys of both objects
+      const keys1 = Object.keys(obj1);
+      const keys2 = Object.keys(obj2);
+  
+      // Compare the lengths of the object keys
+      if (keys1.length !== keys2.length) {
+        console.log(`Object key length mismatch at path: ${path}`);
+        console.log(`Keys 1: ${keys1}`);
+        console.log(`Keys 2: ${keys2}`);
+        return false;
+      }
+  
+      // Compare each key-value pair in the objects
+      for (const key of keys1) {
+        const subPath = path ? `${path}.${key}` : key;
+  
+        if (!obj2.hasOwnProperty(key) || !deepEqual(obj1[key], obj2[key], subPath)) {
+          return false;
+        }
+      }
+  
+      return true;
+    }
+  
+    // Compare primitive values using strict equality
+    if (obj1 !== obj2) {
+      console.log(`Value mismatch at path: ${path}`);
+      console.log(`Value 1: ${obj1}`);
+      console.log(`Value 2: ${obj2}`);
+      return false;
+    }
+  
+    return true;
+  }
+  
+
+export function getFromLocalStorage(todoArray) {
+
+    const allEntries = todoArray || [];
     let todo_arr = []
     allEntries.forEach(todo =>
         todo_arr.push(
             tag.li(
                 {
-                    "class": taskCompleted(todo),
+                    "class": todo.completed ? "completed" : "",
                     "data-id": todo.id,
                 },
                 {},
@@ -27,14 +106,19 @@ export function getFromLocalStorage() {
                         },
                         {
                             "onclick": (evt) => {
-                                let [node, index] = nodeIndex(evt)
+                                let [_, index] = nodeIndex(evt)
                                 orbital.todo[index].completed = !orbital.todo[index].completed
-                                if (orbital.todo[index].completed) {
-                                    node.className = "completed"
-                                } else {
-                                    node.className = ""
-                                }
-                                updateCount();
+                                const newApp= tag.section({
+                                    "class": "todoapp",
+                                }, {}, {}, todo_header,
+                                    main_section(orbital.todo),
+                                    footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length)
+                                )
+                                console.log(newApp)
+                                const patch=diff(sectionObj,newApp)
+                                let s=patch(rootEl)
+                                changeRootEl(s)
+                                changeSectionObj(newApp)
                             }
                         },
                         {
@@ -64,14 +148,6 @@ export function getFromLocalStorage() {
     return todo_arr.reverse()
 }
 
-
-function taskCompleted(todo) {
-    if (todo.completed) {
-        return "completed"
-    }
-    return ""
-}
-
 export function insertIntoLocalStorage(evt) {
     if (evt.key == "Enter" || evt.key == 13) {
         if (evt.target.value != "" && !/^\s+$/.test(evt.target.value)) {
@@ -81,10 +157,18 @@ export function insertIntoLocalStorage(evt) {
                 completed: false,
             }
             orbital.todo.push(new_todo_obj);
-            document.querySelector(".todo-list").prepend(createNode(getFromLocalStorage()[0]))
+            const newApp= tag.section({
+                "class": "todoapp",
+            }, {}, {}, todo_header,
+            main_section(orbital.todo),
+            footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
+            )
+            const patch=diff(sectionObj,newApp)
+            let s=patch(rootEl)
+            changeRootEl(s)
+            changeSectionObj(newApp)
             evt.target.value = ""
         }
-        updateCount();
     }
 }
 
@@ -142,8 +226,16 @@ export function editLabelInStorage(evt1) {
 export function removeFromLocalStorage(evt) {
     let [node, index] = nodeIndex(evt);
     orbital.todo.splice(index, 1);
-    node.remove();
-    updateCount();
+    const newApp= tag.section({
+        "class": "todoapp",
+    }, {}, {}, todo_header,
+    main_section(orbital.todo),
+    footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
+    )
+    const patch=diff(sectionObj,newApp)
+    let s=patch(rootEl)
+    changeRootEl(s)
+    changeSectionObj(newApp)
 }
 
 function nodeIndex(evt) {

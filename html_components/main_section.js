@@ -5,7 +5,7 @@ let style = "display: block;";
 if (orbital.todo.length <= 0){
     style = "display: none;"
 }
-export const main_section = tag.section(
+export const main_section =(todoArray)=> tag.section(
     { class: "main", style:`${style}`},
     {},
     {},
@@ -27,6 +27,6 @@ export const main_section = tag.section(
         { class: "todo-list" },
         {},
         {},
-        ...getFromLocalStorage()
+        ...getFromLocalStorage(todoArray)
     )
 )

@@ -10,12 +10,13 @@ function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}
 
 export function createNode(obj) {
     const result = document.createElement(obj.tag);
-
-    for (const [key, value] of Object.entries(obj.attrs)) {
-        if (key == "textContent") {
-            result.appendChild(text(value))
-        } else {
-            result.setAttribute(key, value);
+    if (obj.attrs) {
+        for (const [key, value] of Object.entries(obj.attrs)) {
+            if (key == "textContent") {
+                result.appendChild(text(value))
+            } else {
+                result.setAttribute(key, value);
+            }
         }
     }
 
