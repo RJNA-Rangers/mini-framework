@@ -4,42 +4,57 @@ export const footerInfo = tag.footer(
     {},
     {},
     tag.p(
-        { textContent: "Double-Click to edit a todo" }
+        {},
+        {},
+        {},
+        "Double-Click to edit a todo"
     ),
     tag.p(
-        { textContent: "Created by " },
         {},
         {},
+        {},
+        "Created by ",
         tag.a(
             {
                 href: "#",
-                textContent: " Remington Smith "
-            }
+            },
+            {},
+            {},
+            " Remington Smith, "
         ),
         tag.a(
             {
                 href: "#",
-                textContent: " Jason Asante "
-            }
+            },
+            {},
+            {},
+            " Jason Asante, "
         ),
         tag.a({
             href: "#",
-            textContent: " Nik Don "
-        }),
+        },
+        {},
+        {},
+        " Nikolo Don, "),
         tag.a({
             href: "#",
-            textContent: " Abd Al-Raheem Khan "
-        }),
+        },
+        {},
+        {},
+        " Abd Al-Raheem Khan"),
     ),
     tag.p(
-        { textContent: "Part of " },
         {},
         {},
+        {},
+        "Part of ",
         tag.a(
             {
                 href: "http://todomvc.com",
-                textContent: "TodoMVC"
-            }
+            },
+            {},
+            {},
+            "TodoMVC"
         )
     )
 )

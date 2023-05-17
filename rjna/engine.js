@@ -12,11 +12,7 @@ export function createNode(obj) {
     const result = document.createElement(obj.tag);
     if (obj.attrs) {
         for (const [key, value] of Object.entries(obj.attrs)) {
-            if (key == "textContent") {
-                result.appendChild(text(value))
-            } else {
-                result.setAttribute(key, value);
-            }
+            result.setAttribute(key, value);
         }
     }
 
@@ -25,7 +21,6 @@ export function createNode(obj) {
             if (typeof child == "string") {
                 result.appendChild(text(child))
             } else {
-
                 result.appendChild(createNode(child));
             }
         }

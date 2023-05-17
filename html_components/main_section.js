@@ -20,8 +20,10 @@ export const main_section =(todoArray)=> tag.section(
     tag.label(
         {
             for: "toggle-all",
-            textContent: "Mark All As Complete"
-        }
+        },
+        {},
+        {},
+        "Mark All As Complete"
     ),
     tag.ul(
         { class: "todo-list" },

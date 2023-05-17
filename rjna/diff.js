@@ -13,12 +13,6 @@ const diffAttrs = (oldAttrs, newAttrs) => {
     const patches = []
     // set new attributes
     for (const [k, v] of Object.entries(newAttrs)) {
-        if (k == "textContent") {
-            patches.push((node) => {
-                node.textContent = v;
-                return node;
-            })
-        }
         patches.push(node => {
             node.setAttribute(k, v)
             return node
@@ -46,9 +40,8 @@ const diffChildren = (oldVChildren, newVChildren) => {
         if (typeof oldVChild === "string" && typeof newVChild === "string") {
             if (oldVChild !== newVChild) {
                 childPatches.push((node) => {
-                    const newTextNode = document.createTextNode(newVChild);
-                    node.parentNode.replaceChild(newTextNode, node);
-                    return newTextNode;
+                    node.parentNode.replaceChild(text(newVChild), node);
+                    return node;
                 });
             }
         } else {
@@ -59,7 +52,6 @@ const diffChildren = (oldVChildren, newVChildren) => {
     for (const addVChild of newVChildren.splice(oldVChildren.length)) {
         if (typeof addVChild == "string") {
             node.textContent = v
-            // appendChild(createNode(addVChild))
             return node
         }
         additionalPatches.push(node => {
@@ -69,6 +61,15 @@ const diffChildren = (oldVChildren, newVChildren) => {
 
     }
 
+    const removalPatches = [];
+    for (const removeVChild of oldVChildren.slice(newVChildren.length)) {
+        removalPatches.push(node => {
+            node.removeChild(node.lastChild);
+            return node;
+        });
+    }
+    
+
     return parent => {
         for (const [patch, child] of zip(childPatches, parent.childNodes)) {
             patch(child)
@@ -76,6 +77,11 @@ const diffChildren = (oldVChildren, newVChildren) => {
         for (const patch of additionalPatches) {
             patch(parent)
         }
+
+        for (const patch of removalPatches) {
+            patch(parent)
+        }
+       
         return parent
     }
 }
@@ -87,6 +93,7 @@ const diff = (oldVD, newVD) => {
             return undefined
         }
     }
+
 
     if (typeof oldVD === "string" ||
         typeof newVD === "string") {

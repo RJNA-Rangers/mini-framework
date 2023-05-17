@@ -126,12 +126,12 @@ export function getFromLocalStorage(todoArray) {
                         }
                     ),
                     tag.label(
-                        {
-                            "textContent": todo.content,
-                        },
+                        {},
                         {
                             "ondblclick": (evt) => editLabelInStorage(evt),
                         },
+                        {},
+                        todo.content
                     ),
                     tag.button(
                         {
@@ -232,8 +232,10 @@ export function removeFromLocalStorage(evt) {
     main_section(orbital.todo),
     footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
     )
+    console.log( main_section(orbital.todo))
     const patch=diff(sectionObj,newApp)
     let s=patch(rootEl)
+    console.log({s})
     changeRootEl(s)
     changeSectionObj(newApp)
 }

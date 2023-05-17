@@ -1,17 +1,8 @@
-import { tag, tagWithState } from "../rjna/elements.js";
+import { tag} from "../rjna/elements.js";
 import { createNode } from "../rjna/engine.js";
 import { clearCompleted, getFromLocalStorage } from "../storage/functions.js";
 const todos = orbital.todo;
 const state = { count: todos.length - todos.filter(todo => todo.completed).length };
-// const todo_counter= (count) => tag.span(
-//   {
-//     class: "todo-count",
-//   },
-//   {},
-//   {},
-//   tag.strong({ textContent: count.toString() }),
-//   " items left ",
-// );
 
 const todo_clear_completed = tag.button(
   {
@@ -21,11 +12,12 @@ const todo_clear_completed = tag.button(
   {},
   tag.a(
     {
-      textContent: "Clear Completed",
     },
     {
       onclick: (evt) => clearCompleted(evt),
-    }
+    },
+    {},
+    "Clear Completed"
   )
 );
 
@@ -42,8 +34,10 @@ const todo_filters = tag.ul(
     tag.a({
       href: "#/",
       class: "selected",
-      textContent: "All",
-    })
+    },
+    {},
+    {},
+    "All")
   ),
   tag.li(
     {},
@@ -51,7 +45,6 @@ const todo_filters = tag.ul(
     {},
     tag.a({
       href: "#/active",
-      textContent: "Active",
     },
       {
         onclick: () => {
@@ -75,6 +68,8 @@ const todo_filters = tag.ul(
           document.querySelector(".todo-list").replaceChildren(...newActiveTodoObj)
         }
       },
+      {},
+      "Active"
     )
   ),
   tag.li(
@@ -83,8 +78,10 @@ const todo_filters = tag.ul(
     {},
     tag.a({
       href: "#/completed",
-      textContent: "Completed",
-    })
+    },
+    {},
+    {},
+    "Completed")
   )
 );
 let display = "";
@@ -104,7 +101,7 @@ export const footer_section =(count)=> tag.footer(
     },
     {},
     {},
-    tag.strong({ textContent: count.toString() }),
+    tag.strong({}, {}, {}, count.toString()),
     " items left ",
   ),
   todo_filters,

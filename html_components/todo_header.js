@@ -8,9 +8,7 @@ export const todo_header = tag.header(
     },
     {},
     {},
-    tag.h1({
-        textContent: "todos"
-    }),
+    tag.h1({},{},{},"todos"),
     tag.input(
         {
             class: "new-todo",
