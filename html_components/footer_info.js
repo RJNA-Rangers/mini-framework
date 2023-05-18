@@ -16,7 +16,7 @@ export const footerInfo = tag.footer(
         "Created by ",
         tag.a(
             {
-                href: "#",
+                href: "https://github.com/rsmith-github",
             },
             {},
             {},
@@ -24,24 +24,24 @@ export const footerInfo = tag.footer(
         ),
         tag.a(
             {
-                href: "#",
+                href: "https://github.com/Jasonasante",
             },
             {},
             {},
             " Jason Asante, "
         ),
         tag.a({
-            href: "#",
+            href: "https://github.com/nik-don",
         },
-        {},
-        {},
-        " Nikolo Don, "),
+            {},
+            {},
+            " Nikolo Don, "),
         tag.a({
-            href: "#",
+            href: "https://github.com/AbdKhan1",
         },
-        {},
-        {},
-        " Abd Al-Raheem Khan"),
+            {},
+            {},
+            " Abd Al-Raheem Khan"),
     ),
     tag.p(
         {},

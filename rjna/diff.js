@@ -18,7 +18,7 @@ const diffAttrs = (oldAttrs, newAttrs) => {
             return node
         })
     }
-    // remove new atrributes
+    // remove old atrributes
     for (const [k] of Object.entries(oldAttrs)) {
         if (!(k in newAttrs)) {
             patches.push(node => {
@@ -34,13 +34,39 @@ const diffAttrs = (oldAttrs, newAttrs) => {
     }
 }
 
+const diffProperty = (oldProperty, newProperty) => {
+    const patches = []
+    // set new properties
+    for (const [k, v] of Object.entries(newProperty)) {
+        patches.push(node => {
+            node[k]= v
+            return node
+        })
+    }
+    // remove old attributes
+    for (const [k] of Object.entries(oldProperty)) {
+        if (!(k in newProperty)) {
+            patches.push(node => {
+                delete node.k
+                return node
+            })
+        }
+    }
+    return node => {
+        for (const patch of patches) {
+            patch(node)
+        }
+    }
+}
+
 const diffChildren = (oldVChildren, newVChildren) => {
     const childPatches = []
+    // changes the content of children within the same range of previous state.
     for (const [oldVChild, newVChild] of zip(oldVChildren, newVChildren)) {
-        if (typeof oldVChild === "string" && typeof newVChild === "string") {
+        if (typeof oldVChild === "string" || typeof newVChild === "string") {
             if (oldVChild !== newVChild) {
                 childPatches.push((node) => {
-                    node.parentNode.replaceChild(text(newVChild), node);
+                    node.replaceWith(text(newVChild));
                     return node;
                 });
             }
@@ -48,19 +74,26 @@ const diffChildren = (oldVChildren, newVChildren) => {
             childPatches.push(diff(oldVChild, newVChild));
         }
     }
-    const additionalPatches = []
-    for (const addVChild of newVChildren.splice(oldVChildren.length)) {
-        if (typeof addVChild == "string") {
-            node.textContent = v
-            return node
-        }
-        additionalPatches.push(node => {
-            node.appendChild(createNode(addVChild))
-            return node
-        })
 
+    // adds additional children
+    const additionalPatches = []
+    const additionalElements = newVChildren.slice(oldVChildren.length)
+    for (const addVChild of additionalElements) {
+        if (typeof addVChild == "string") {
+            additionalPatches.push(node => {
+                node.appendChild(text(addVChild))
+                return node
+            })
+        } else {
+            additionalPatches.push(node => {
+                const newNode = createNode(addVChild)
+                node.appendChild(newNode)
+                return node
+            })
+        }
     }
 
+    // removes deleted children
     const removalPatches = [];
     for (const removeVChild of oldVChildren.slice(newVChildren.length)) {
         removalPatches.push(node => {
@@ -68,20 +101,21 @@ const diffChildren = (oldVChildren, newVChildren) => {
             return node;
         });
     }
-    
 
     return parent => {
+        // applies corresponding function child node (patch= function, child= child node)
         for (const [patch, child] of zip(childPatches, parent.childNodes)) {
             patch(child)
         }
+        // appends child to parent
         for (const patch of additionalPatches) {
             patch(parent)
         }
-
+        // removes child from parent
         for (const patch of removalPatches) {
             patch(parent)
         }
-       
+
         return parent
     }
 }
@@ -93,7 +127,6 @@ const diff = (oldVD, newVD) => {
             return undefined
         }
     }
-
 
     if (typeof oldVD === "string" ||
         typeof newVD === "string") {
@@ -115,13 +148,14 @@ const diff = (oldVD, newVD) => {
             return newNode
         }
     }
-
     const patchAttrs = diffAttrs(oldVD.attrs, newVD.attrs);
+    const patchProperties = diffProperty(oldVD.property, newVD.property);
     const patchChildren = diffChildren(oldVD.children, newVD.children);
 
     return node => {
         patchAttrs(node);
         patchChildren(node)
+        patchProperties(node)
         return node
     }
 }

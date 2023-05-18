@@ -1,12 +1,15 @@
-import { tag} from "../rjna/elements.js";
+import { tag } from "../rjna/elements.js";
 import { createNode } from "../rjna/engine.js";
-import { clearCompleted, getFromLocalStorage } from "../storage/functions.js";
-const todos = orbital.todo;
-const state = { count: todos.length - todos.filter(todo => todo.completed).length };
+import { getFromLocalStorage } from "../storage/functions.js";
+import { main_section } from "./main_section.js";
+import { todo_header } from "./todo_header.js";
+import { getSectionObj, changeRootEl, changeSectionObj, rootEl } from "../main.js";
+import diff from "../rjna/diff.js";
 
-const todo_clear_completed = tag.button(
+const todo_clear_completed = (count) => tag.button(
   {
     class: "clear-completed",
+    style: count.filter(todo => todo.completed).length ? "display: block;" : "display: none;"
   },
   {},
   {},
@@ -14,7 +17,21 @@ const todo_clear_completed = tag.button(
     {
     },
     {
-      onclick: (evt) => clearCompleted(evt),
+      onclick: () => {
+        orbital.todo = orbital.todo.filter(todo => !todo.completed);
+        const newApp = tag.section({
+          "class": "todoapp",
+        },
+          {},
+          {},
+          todo_header,
+          main_section(orbital.todo),
+          footer_section(orbital.todo),
+        )
+        const patch = diff(getSectionObj(), newApp)
+        changeRootEl(patch(rootEl))
+        changeSectionObj(newApp)
+      },
     },
     {},
     "Clear Completed"
@@ -35,9 +52,9 @@ const todo_filters = tag.ul(
       href: "#/",
       class: "selected",
     },
-    {},
-    {},
-    "All")
+      {},
+      {},
+      "All")
   ),
   tag.li(
     {},
@@ -79,19 +96,16 @@ const todo_filters = tag.ul(
     tag.a({
       href: "#/completed",
     },
-    {},
-    {},
-    "Completed")
+      {},
+      {},
+      "Completed")
   )
 );
-let display = "";
-if (todos.length <= 0) {
-  display = "display: none;"
-}
-export const footer_section =(count)=> tag.footer(
+
+export const footer_section = (count) => tag.footer(
   {
     class: "footer",
-    style: `${display}`,
+    style: count.length ? "display: block;" : "display: none;",
   },
   {},
   {},
@@ -101,53 +115,9 @@ export const footer_section =(count)=> tag.footer(
     },
     {},
     {},
-    tag.strong({}, {}, {}, count.toString()),
+    tag.strong({}, {}, {}, (count.length - count.filter(todo => todo.completed).length).toString()),
     " items left ",
   ),
   todo_filters,
-  todo_clear_completed
+  todo_clear_completed(count)
 );
-
-export const updateCount = () => {
-  console.log(window.location.href.split("/"))
-  switch (window.location.href.split("/")[window.location.href.split("/").length-1]) {
-    case "active":
-      // state.count = getFromLocalStorage().length - document.querySelectorAll('.completed').length || 0;
-      // let newCounter = todo_counter
-      // newCounter.children[0].attrs.textContent = `${state.count}`
-      // console.log(newCounter)
-      // counterState.render(newCounter, document.querySelector(".todo-count").firstChild)
-
-      // if (getFromLocalStorage().length > 0) {
-      //   document.querySelector('.main').style.display = "block";
-      //   footer_section.attrs.style = "";
-      //   footerState.render(footer_section, document.querySelector(".footer"));
-      // } else {
-      //   document.querySelector('.main').style.display = "none";
-      //   footer_section.attrs.style = "display: none;";
-      //   footerState.render(footer_section, document.querySelector(".footer"));
-      // }
-      console.log("active")
-    case "completed":
-
-    default:
-      state.count = getFromLocalStorage().length - document.querySelectorAll('.completed').length || 0;
-      let newCounter = todo_counter
-      newCounter.children[0].attrs.textContent = `${state.count}`
-      console.log(newCounter)
-      counterState.render(newCounter, document.querySelector(".todo-count").firstChild)
-
-      if (getFromLocalStorage().length > 0) {
-        document.querySelector('.main').style.display = "block";
-        footer_section.attrs.style = "";
-        footerState.render(footer_section, document.querySelector(".footer"));
-      } else {
-        document.querySelector('.main').style.display = "none";
-        footer_section.attrs.style = "display: none;";
-        footerState.render(footer_section, document.querySelector(".footer"));
-      }
-
-
-  }
-
-};

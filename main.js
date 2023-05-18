@@ -9,26 +9,30 @@ export let sectionObj = tag.section({
     "class": "todoapp",
 }, {}, {}, todo_header,
     main_section(orbital.todo),
-    footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
+    footer_section(orbital.todo),
 )
-export function changeSectionObj(newObj){
-    sectionObj=newObj
+export function changeSectionObj(newObj) {
+    sectionObj = newObj
+}
+
+export function getSectionObj() {
+    return sectionObj
 }
 
 export let rootEl
-export function changeRootEl(newNode){
-    rootEl=newNode
+export function changeRootEl(newNode) {
+    rootEl = newNode
 }
-export function createTodo(){
+export function createTodo() {
     return tag.section({
         "class": "todoapp",
     }, {}, {}, todo_header,
         main_section(orbital.todo),
-        footer_section(orbital.todo.length - orbital.todo.filter(todo => todo.completed).length),
+        footer_section(orbital.todo),
     )
 }
 window.onload = () => {
-    rootEl=RJNA.createNode(sectionObj)
+    rootEl = RJNA.createNode(createTodo())
     document.body.appendChild(rootEl);
     document.body.appendChild(RJNA.createNode(footerInfo))
 
