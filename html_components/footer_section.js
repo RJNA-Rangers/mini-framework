@@ -1,6 +1,7 @@
 import { tag } from "../rjna/elements.js";
-import { createNode } from "../rjna/engine.js";
-import { getFromLocalStorage } from "../storage/functions.js";
+import RJNA from "../rjna/engine.js"
+// import { createNode } from "../rjna/engine.js";
+// import { getFromLocalStorage } from "../storage/functions.js";
 import { main_section } from "./main_section.js";
 import { todo_header } from "./todo_header.js";
 import { getSectionObj, changeRootEl, changeSectionObj, rootEl } from "../main.js";
@@ -50,9 +51,29 @@ const todo_filters = tag.ul(
     {},
     tag.a({
       href: "#/",
-      class: "selected",
+      class: window.location.href.split("/")[window.location.href.split("").length - 1] == "#" ? "selected" : window.location.href.split("/")[window.location.href.split("/").length - 1] == "" ? "selected" : "",
     },
-      {},
+      {
+        onclick: () => {
+          // re page as orbital.todo will nly contain
+          // !todo.completed
+          const newApp = tag.section({
+            "class": "todoapp",
+          },
+            {},
+            {},
+            todo_header,
+            main_section(orbital.todo),
+            footer_section(orbital.todo),
+          )
+          const patch = diff(getSectionObj(), newApp)
+          changeRootEl(patch(rootEl))
+          changeSectionObj(newApp)
+
+          // get ul children from section obj(li's)
+          // input checked (on click function), will re render page as todo is chasnged
+        }
+      },
       {},
       "All")
   ),
@@ -62,27 +83,49 @@ const todo_filters = tag.ul(
     {},
     tag.a({
       href: "#/active",
+      class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "active" ? "selected" : ""
     },
       {
-        onclick: () => {
-          // let hash=evt.target.hash
-          // console.log({hash})
-          let todoListObj = getFromLocalStorage()
-          let activeTodoObj = todoListObj.filter(todo => todo.attrs.class != "completed")
+        onclick: (evt) => {
+          // re page as orbital.todo will nly contain
+          // !todo.completed
+          const oldSection = JSON.parse(JSON.stringify(getSectionObj()))
+          const [oldSelectedVDom, currentSelectedVDom] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), "selected");
+          console.log(oldSelectedVDom)
+          // currentSelectedVDom.attrs["class"]=currentSelectedVDom.attrs["class"].replace("selected", " ")
+          // const [[oldActiveVDom], [currentActiveVDom]] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), "#/active");
+          // currentActiveVDom.attrs["class"]="selected"
+          // console.log(orbital)
+          // orbital.todo.forEach(todo => {
+          //   const [[oldLiVDom], [currentLiVDom]] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), todo.id);
+          //   // console.log(oldLiVDom)
+            
+          // });
+          // const newApp = RJNA.replaceParentNode(getSectionObj(), oldVDom, currentVDom)
 
-          console.log({ activeTodoObj })
-          // change onclick function for each todo
-          // create an array of doms with new onclick
-          // replace ul children with the new dom Array
-          let newActiveTodoObj = activeTodoObj.map(todo => {
-            console.log(todo)
-            todo.children[0].children[0]["onclick"] = (evt) => {
-              let [node, _] = nodeIndex()
-              node.remove()
-            }
-            return createNode(todo)
-          })
-          document.querySelector(".todo-list").replaceChildren(...newActiveTodoObj)
+          const [oldLiVDom, currentLiVDom] = RJNA.getObjByTag(getSectionObj(), "li");
+          // get all toggle class lis
+          // "change the onclick function"
+
+
+          console.log(oldLiVDom)
+          let todo = orbital.todo.filter(todo => !todo.completed);
+          const newApp = tag.section({
+            "class": "todoapp",
+          },
+            {},
+            {},
+            todo_header,
+            main_section(todo),
+            footer_section(todo),
+          )
+          // inside new newApp, get selected tag and 
+          const patch = diff(getSectionObj(), newApp)
+          changeRootEl(patch(rootEl))
+          changeSectionObj(newApp)
+
+          // get ul children from section obj(li's)
+          // input checked (on click function), will re render page as todo is chasnged
         }
       },
       {},
@@ -95,8 +138,29 @@ const todo_filters = tag.ul(
     {},
     tag.a({
       href: "#/completed",
+      class:window.location.href.split("/")[window.location.href.split("/").length - 1] == "completed" ? "selected" : ""
     },
-      {},
+      {
+        onclick: () => {
+          // re page as orbital.todo will nly contain
+          // todo.completed
+          let todo = orbital.todo.filter(todo => todo.completed);
+          const newApp = tag.section({
+            "class": "todoapp",
+          },
+            {},
+            {},
+            todo_header,
+            main_section(todo),
+            footer_section(todo),
+          )
+          const patch = diff(getSectionObj(), newApp)
+          changeRootEl(patch(rootEl))
+          changeSectionObj(newApp)
+          // get ul children from section obj(li's)
+          // input checked (on click function), will re render page as todo is chasnged
+        }
+      },
       {},
       "Completed")
   )

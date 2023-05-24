@@ -43,61 +43,58 @@ function appendElement(child, parent) {
     parent.appendChild(child)
 }
 
-// Define a helper function for creating DOM elements using tagged template literals
-function DomToObj(element) {
+function getObjByAttrsAndPropsVal(obj, value, parent = null, key = null) {
+    const result = [];
+    function searchInObject(obj, parent) {
+        for (const prop in obj) {
+            const currentValue = obj[prop];
+            if (typeof currentValue === 'object') {
+                searchInObject(currentValue, obj, prop);
+            } else if (currentValue === value) {
+                result.push(parent);
+            }
+        }
+    }
+    searchInObject(obj, null, null);
+    return [result, JSON.parse(JSON.stringify(result))];
+}
 
-    const tag = element.nodeName.toLowerCase();
-    const attrs = {};
-    const property = {};
-    const booleanProperties = [
-        'disabled',
-        'checked',
-        'readonly',
-        'required',
-        'multiple',
-        'autoplay',
-        'hidden',
-        'selected',
-        'autofocus',
-        'spellcheck',
-        'draggable',
-        'contenteditable',
-        'download',
-        'translate'
-    ];
+function getObjByTag(obj, value, parent = null, key = null) {
+    const result = [];
+    function searchInObject(obj, parent, key) {
+        for (const prop in obj) {
+            const currentValue = obj[prop];
+            if (typeof currentValue === 'object') {
+                searchInObject(currentValue, obj, prop);
+            } else if (currentValue === value) {
+                if (prop === "tag") {
+                    result.push(obj);
+                }
+            }
+        }
+    }
 
-    for (const { name, value } of element.attributes) {
-        if (booleanProperties.includes(name)) {
-            property[name] = value !== null
+    searchInObject(obj, null, null);
+    return [result, JSON.parse(JSON.stringify(result))];
+}
+
+
+function replaceParentNode(obj, parentNode, modifiedParentNode) {
+    function replaceObject(obj, parentNode, modifiedParentNode) {
+        if (obj === parentNode) {
+            Object.assign(obj, modifiedParentNode);
         } else {
-            attrs[name] = value;
+            if (obj.children) {
+                for (let i = 0; i < obj.children.length; i++) {
+                    replaceObject(obj.children[i], parentNode, modifiedParentNode);
+                }
+            }
         }
     }
 
-    for (const key in element) {
-        const eventName = key; // Remove 'on' prefix
-        if (key.startsWith('on') && typeof element[key] === 'function') {
-            property[eventName] = element[key];
-        } else if (booleanProperties.includes(key)) {
-            property[eventName] = element[key]
-        }
-    }
+    replaceObject(obj, parentNode, modifiedParentNode);
 
-    const children = [];
-    for (const child of element.childNodes) {
-        if (child.nodeType === Node.TEXT_NODE) {
-            children.push(child.textContent);
-        } else if (child.nodeType === Node.ELEMENT_NODE) {
-            children.push(DomToObj(child));
-        }
-    }
-
-    return {
-        tag,
-        attrs,
-        property,
-        children,
-    };
+    return obj
 }
 
 
@@ -105,7 +102,9 @@ const RJNA = {
     createElement,
     createNode,
     appendElement,
-    DomToObj
+    getObjByAttrsAndPropsVal,
+    replaceParentNode,
+    getObjByTag
 };
 
 export default RJNA
