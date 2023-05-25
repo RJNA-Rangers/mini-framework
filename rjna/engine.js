@@ -1,4 +1,7 @@
+import { getSectionObj, changeSectionObj, changeRootEl, createTodo, rootEl } from "../main.js";
+import diff from "./diff.js";
 
+// creates VDOM
 function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}, ...children) {
     return {
         tag,
@@ -8,6 +11,31 @@ function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}
     }
 }
 
+// all html tags
+const htmlTags = [
+    "a", "abbr", "address", "area", "article", "aside", "audio",
+    "b", "base", "bdi", "bdo", "blockquote", "body", "br", "button",
+    "canvas", "caption", "cite", "code", "col", "colgroup", "data",
+    "datalist", "dd", "del", "details", "dfn", "dialog", "div", "dl",
+    "dt", "em", "embed", "fieldset", "figcaption", "figure", "footer",
+    "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr",
+    "html", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend",
+    "li", "link", "main", "map", "mark", "meta", "meter", "nav", "noscript",
+    "object", "ol", "optgroup", "option", "output", "p", "param", "picture",
+    "pre", "progress", "q", "rb", "rp", "rt", "rtc", "ruby", "s", "samp",
+    "script", "section", "select", "slot", "small", "source", "span", "strong",
+    "style", "sub", "summary", "sup", "table", "tbody", "td", "template", "textarea",
+    "tfoot", "th", "thead", "time", "title", "tr", "track", "u", "ul", "var", "video",
+    "wbr"
+];
+
+// creates createElement function for each html tag
+const tag = {}
+htmlTags.forEach((tagName) => {
+    tag[tagName] = (attributes = {}, eventHandlers = {}, properties = {}, ...children) => RJNA.createElement(tagName, attributes, eventHandlers, properties, ...children)
+})
+
+// creates and returns real DOM from createElement obj.
 export function createNode(obj) {
     const result = document.createElement(obj.tag);
     if (obj.attrs) {
@@ -35,15 +63,15 @@ export function createNode(obj) {
     return result;
 }
 
+// creates text text node for input
 export function text(input) {
     return document.createTextNode(input)
 }
 
-function appendElement(child, parent) {
-    parent.appendChild(child)
-}
-
-function getObjByAttrsAndPropsVal(obj, value, parent = null, key = null) {
+// deep searches through the all keys, with the exception of tag, 
+// of the input object and returns two identical arrays [untouch, toModify]
+// of the parent objs that match the input value
+function getObjByAttrsAndPropsVal(obj, value) {
     const result = [];
     function searchInObject(obj, parent) {
         for (const prop in obj) {
@@ -51,7 +79,8 @@ function getObjByAttrsAndPropsVal(obj, value, parent = null, key = null) {
             if (typeof currentValue === 'object') {
                 searchInObject(currentValue, obj, prop);
             } else if (currentValue === value) {
-                result.push(parent);
+                if (prop != "tag")
+                    result.push(parent);
             }
         }
     }
@@ -59,9 +88,12 @@ function getObjByAttrsAndPropsVal(obj, value, parent = null, key = null) {
     return [result, JSON.parse(JSON.stringify(result))];
 }
 
-function getObjByTag(obj, value, parent = null, key = null) {
+// deep searches through the tag key of the input object and returns 
+// two identical arrays [untouch, toModify] of objs that match the
+// input value
+function getObjByTag(obj, value) {
     const result = [];
-    function searchInObject(obj, parent, key) {
+    function searchInObject(obj) {
         for (const prop in obj) {
             const currentValue = obj[prop];
             if (typeof currentValue === 'object') {
@@ -78,33 +110,46 @@ function getObjByTag(obj, value, parent = null, key = null) {
     return [result, JSON.parse(JSON.stringify(result))];
 }
 
-
-function replaceParentNode(obj, parentNode, modifiedParentNode) {
-    function replaceObject(obj, parentNode, modifiedParentNode) {
-        if (obj === parentNode) {
-            Object.assign(obj, modifiedParentNode);
+// replaces the old node obj with modified/new node object and 
+// applies those changes to real node whilst updating the specified
+// object.
+function replaceParentNode(obj, node, modifiedNode) {
+    let oldSection = JSON.parse(JSON.stringify(getSectionObj()))
+    function replaceObject(obj, node, modifiedNode) {
+        if (obj === node) {
+            Object.assign(obj, modifiedNode);
         } else {
             if (obj.children) {
                 for (let i = 0; i < obj.children.length; i++) {
-                    replaceObject(obj.children[i], parentNode, modifiedParentNode);
+                    replaceObject(obj.children[i], node, modifiedNode);
                 }
             }
         }
     }
+    replaceObject(obj, node, modifiedNode);
+    const patch = diff(oldSection, obj)
+    changeRootEl(patch(rootEl))
+    changeSectionObj(obj)
+}
 
-    replaceObject(obj, parentNode, modifiedParentNode);
-
-    return obj
+// updates specified obj in accordance to state changes and apply
+// those changes to the real DOM.
+function update() {
+    const newApp = createTodo()
+    const patch = diff(getSectionObj(), newApp)
+    changeRootEl(patch(rootEl))
+    changeSectionObj(newApp)
 }
 
 
 const RJNA = {
+    tag,
     createElement,
     createNode,
-    appendElement,
     getObjByAttrsAndPropsVal,
     replaceParentNode,
-    getObjByTag
+    getObjByTag,
+    update
 };
 
 export default RJNA

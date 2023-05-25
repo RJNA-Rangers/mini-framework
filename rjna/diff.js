@@ -1,5 +1,7 @@
 import { createNode, text } from "./engine.js"
-
+// takes two arrays as a parameter and returns a new array
+// with the merged values, but only up until the shortest length
+//  of both given arrays
 const zip = (a, b) => {
     const zipped = []
     for (let i = 0; i < Math.min(a.length, b.length); i++) {
@@ -8,7 +10,8 @@ const zip = (a, b) => {
     return zipped
 }
 
-
+// returns array of function to apply to the attributes of DOM,
+// in accordance to the new attribute object
 const diffAttrs = (oldAttrs, newAttrs) => {
     const patches = []
     // set new attributes
@@ -34,6 +37,8 @@ const diffAttrs = (oldAttrs, newAttrs) => {
     }
 }
 
+// returns array of function to apply to the properties of DOM,
+// in accordance to the new property object
 const diffProperty = (oldProperty, newProperty) => {
     const patches = []
     // set new properties
@@ -59,6 +64,8 @@ const diffProperty = (oldProperty, newProperty) => {
     }
 }
 
+// returns array of function to apply to the children of DOM,
+// in accordance to the new attribute object
 const diffChildren = (oldVChildren, newVChildren) => {
     const childPatches = []
     // changes the content of children within the same range of previous state.
@@ -120,44 +127,52 @@ const diffChildren = (oldVChildren, newVChildren) => {
     }
 }
 
+// Performs a diff between two virtual DOM and creates a patch
+// function that is be applied to the real DOM, updating it.
 const diff = (oldVD, newVD) => {
+    // Handle the case where newVD is undefined (i.e., node should be removed)
     if (newVD === undefined) {
+      return node => {
+        node.remove();
+        return undefined;
+      };
+    }
+  
+    // Handle the case where either oldVD or newVD is a string
+    if (typeof oldVD === "string" || typeof newVD === "string") {
+      if (oldVD === newVD) {
         return node => {
-            node.remove()
-            return undefined
-        }
+          const newNode = createNode(newVD);
+          node.replaceWith(newNode);
+          return newNode;
+        };
+      } else {
+        return node => undefined;
+      }
     }
-
-    if (typeof oldVD === "string" ||
-        typeof newVD === "string") {
-        if (oldVD === newVD) {
-            return node => {
-                const newNode = createNode(newVD)
-                node.replaceWith()
-                return newNode
-            }
-        } else {
-            return node => undefined
-        }
-    }
-
+  
+    // Handle the case where oldVD and newVD have different tags
     if (oldVD.tag !== newVD.tag) {
-        return node => {
-            const newNode = createNode(newVD)
-            node.replaceWith()
-            return newNode
-        }
+      return node => {
+        const newNode = createNode(newVD);
+        node.replaceWith(newNode);
+        return newNode;
+      };
     }
+  
+    // Perform diffing for attributes, properties, and children
     const patchAttrs = diffAttrs(oldVD.attrs, newVD.attrs);
     const patchProperties = diffProperty(oldVD.property, newVD.property);
     const patchChildren = diffChildren(oldVD.children, newVD.children);
-
+  
+    // Return the patch function that applies the diffing changes to the real DOM
     return node => {
-        patchAttrs(node);
-        patchChildren(node)
-        patchProperties(node)
-        return node
-    }
-}
+      patchAttrs(node);
+      patchChildren(node);
+      patchProperties(node);
+      return node;
+    };
+  };
+  
 
 export default diff

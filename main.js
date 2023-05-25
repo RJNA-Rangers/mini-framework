@@ -1,13 +1,13 @@
-import { tag } from "./rjna/elements.js"
 import RJNA from "./rjna/engine.js";
 import { todo_header } from "./html_components/todo_header.js";
 import { main_section } from "./html_components/main_section.js";
 import { footer_section } from "./html_components/footer_section.js";
 import { footerInfo } from "./html_components/footer_info.js";
 
-export let sectionObj = tag.section({
+export let sectionObj = RJNA.tag.section({
     "class": "todoapp",
-}, {}, {}, todo_header,
+}, {}, {},
+    todo_header,
     main_section(orbital.todo),
     footer_section(orbital.todo),
 )
@@ -24,7 +24,7 @@ export function changeRootEl(newNode) {
     rootEl = newNode
 }
 export function createTodo() {
-    return tag.section({
+    return RJNA.tag.section({
         "class": "todoapp",
     }, {}, {}, todo_header,
         main_section(orbital.todo),
@@ -39,8 +39,6 @@ window.onload = () => {
 }
 
 orbital.todo = JSON.parse(localStorage.getItem('todo_list')) || [];
-
-
 
 window.onbeforeunload = () => {
     localStorage.setItem('todo_list', JSON.stringify(orbital.todo))

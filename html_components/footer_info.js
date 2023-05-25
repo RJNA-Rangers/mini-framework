@@ -1,20 +1,22 @@
-import { tag } from "../rjna/elements.js"
-export const footerInfo = tag.footer(
+import RJNA from "../rjna/engine.js"
+
+// footer information section
+export const footerInfo = RJNA.tag.footer(
     { class: "info" },
     {},
     {},
-    tag.p(
+    RJNA.tag.p(
         {},
         {},
         {},
         "Double-Click to edit a todo"
     ),
-    tag.p(
+    RJNA.tag.p(
         {},
         {},
         {},
         "Created by ",
-        tag.a(
+        RJNA.tag.a(
             {
                 href: "https://github.com/rsmith-github",
             },
@@ -22,7 +24,7 @@ export const footerInfo = tag.footer(
             {},
             " Remington Smith, "
         ),
-        tag.a(
+        RJNA.tag.a(
             {
                 href: "https://github.com/Jasonasante",
             },
@@ -30,25 +32,25 @@ export const footerInfo = tag.footer(
             {},
             " Jason Asante, "
         ),
-        tag.a({
+        RJNA.tag.a({
             href: "https://github.com/nik-don",
         },
             {},
             {},
             " Nikolo Don, "),
-        tag.a({
+        RJNA.tag.a({
             href: "https://github.com/AbdKhan1",
         },
             {},
             {},
             " Abd Al-Raheem Khan"),
     ),
-    tag.p(
+    RJNA.tag.p(
         {},
         {},
         {},
         "Part of ",
-        tag.a(
+        RJNA.tag.a(
             {
                 href: "http://todomvc.com",
             },

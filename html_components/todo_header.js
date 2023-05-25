@@ -1,15 +1,15 @@
-import { tag } from "../rjna/elements.js"
+import RJNA from "../rjna/engine.js"
 import { insertIntoLocalStorage } from "../storage/functions.js"
-// main title and input
 
-export const todo_header = tag.header(
+// main title and input text
+export const todo_header = RJNA.tag.header(
     {
         class: "header",
     },
     {},
     {},
-    tag.h1({},{},{},"todos"),
-    tag.input(
+    RJNA.tag.h1({},{},{},"todos"),
+    RJNA.tag.input(
         {
             class: "new-todo",
             placeholder: "What needs to be done?",

@@ -1,26 +1,24 @@
-import { tag } from "../rjna/elements.js";
 import RJNA from "../rjna/engine.js"
-// import { createNode } from "../rjna/engine.js";
-// import { getFromLocalStorage } from "../storage/functions.js";
 import { main_section } from "./main_section.js";
 import { todo_header } from "./todo_header.js";
 import { getSectionObj, changeRootEl, changeSectionObj, rootEl } from "../main.js";
 import diff from "../rjna/diff.js";
 
-const todo_clear_completed = (count) => tag.button(
+// footer section
+const todo_clear_completed = (count) => RJNA.tag.button(
   {
     class: "clear-completed",
     style: count.filter(todo => todo.completed).length ? "display: block;" : "display: none;"
   },
   {},
   {},
-  tag.a(
+  RJNA.tag.a(
     {
     },
     {
       onclick: () => {
         orbital.todo = orbital.todo.filter(todo => !todo.completed);
-        const newApp = tag.section({
+        const newApp = RJNA.tag.section({
           "class": "todoapp",
         },
           {},
@@ -39,17 +37,17 @@ const todo_clear_completed = (count) => tag.button(
   )
 );
 
-const todo_filters = tag.ul(
+const todo_filters = RJNA.tag.ul(
   {
     class: "filters",
   },
   {},
   {},
-  tag.li(
+  RJNA.tag.li(
     {},
     {},
     {},
-    tag.a({
+    RJNA.tag.a({
       href: "#/",
       class: window.location.href.split("/")[window.location.href.split("").length - 1] == "#" ? "selected" : window.location.href.split("/")[window.location.href.split("/").length - 1] == "" ? "selected" : "",
     },
@@ -57,7 +55,7 @@ const todo_filters = tag.ul(
         onclick: () => {
           // re page as orbital.todo will nly contain
           // !todo.completed
-          const newApp = tag.section({
+          const newApp = RJNA.tag.section({
             "class": "todoapp",
           },
             {},
@@ -77,11 +75,11 @@ const todo_filters = tag.ul(
       {},
       "All")
   ),
-  tag.li(
+  RJNA.tag.li(
     {},
     {},
     {},
-    tag.a({
+    RJNA.tag.a({
       href: "#/active",
       class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "active" ? "selected" : ""
     },
@@ -110,7 +108,7 @@ const todo_filters = tag.ul(
 
           console.log(oldLiVDom)
           let todo = orbital.todo.filter(todo => !todo.completed);
-          const newApp = tag.section({
+          const newApp = RJNA.tag.section({
             "class": "todoapp",
           },
             {},
@@ -119,7 +117,7 @@ const todo_filters = tag.ul(
             main_section(todo),
             footer_section(todo),
           )
-          // inside new newApp, get selected tag and 
+          // inside new newApp, get selected RJNA.tag and 
           const patch = diff(getSectionObj(), newApp)
           changeRootEl(patch(rootEl))
           changeSectionObj(newApp)
@@ -132,11 +130,11 @@ const todo_filters = tag.ul(
       "Active"
     )
   ),
-  tag.li(
+  RJNA.tag.li(
     {},
     {},
     {},
-    tag.a({
+    RJNA.tag.a({
       href: "#/completed",
       class:window.location.href.split("/")[window.location.href.split("/").length - 1] == "completed" ? "selected" : ""
     },
@@ -145,7 +143,7 @@ const todo_filters = tag.ul(
           // re page as orbital.todo will nly contain
           // todo.completed
           let todo = orbital.todo.filter(todo => todo.completed);
-          const newApp = tag.section({
+          const newApp = RJNA.tag.section({
             "class": "todoapp",
           },
             {},
@@ -166,20 +164,20 @@ const todo_filters = tag.ul(
   )
 );
 
-export const footer_section = (count) => tag.footer(
+export const footer_section = (count) => RJNA.tag.footer(
   {
     class: "footer",
     style: count.length ? "display: block;" : "display: none;",
   },
   {},
   {},
-  tag.span(
+  RJNA.tag.span(
     {
       class: "todo-count",
     },
     {},
     {},
-    tag.strong({}, {}, {}, (count.length - count.filter(todo => todo.completed).length).toString()),
+    RJNA.tag.strong({}, {}, {}, (count.length - count.filter(todo => todo.completed).length).toString()),
     " items left ",
   ),
   todo_filters,

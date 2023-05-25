@@ -1,16 +1,12 @@
 import { getFromLocalStorage } from "../storage/functions.js"
-import { tag } from "../rjna/elements.js"
-import { todo_header } from "./todo_header.js";
-import { footer_section } from "./footer_section.js";
-import diff from "../rjna/diff.js";
-import { getSectionObj, changeRootEl, changeSectionObj, rootEl } from "../main.js";
-// main section
+import RJNA from "../rjna/engine.js"
 
-export const main_section = (todoArray) => tag.section(
+// main section (todo display)
+export const main_section = (todoArray) => RJNA.tag.section(
     { class: "main", style: todoArray.length ? "display: block;" : "display: none;" },
     {},
     {},
-    tag.input(
+    RJNA.tag.input(
         {
             type: "checkbox",
             class: "toggle-all",
@@ -24,19 +20,11 @@ export const main_section = (todoArray) => tag.section(
                 } else {
                     todoArray.forEach(todo => todo.completed = false)
                 }
-                const newApp = tag.section({
-                    "class": "todoapp",
-                }, {}, {}, todo_header,
-                    main_section(todoArray),
-                    footer_section(todoArray),
-                )
-                const patch = diff(getSectionObj(), newApp)
-                changeRootEl(patch(rootEl))
-                changeSectionObj(newApp)
+                RJNA.update()
             }
         }
     ),
-    tag.label(
+    RJNA.tag.label(
         {
             for: "toggle-all",
         },
@@ -44,7 +32,7 @@ export const main_section = (todoArray) => tag.section(
         {},
         "Mark All As Complete"
     ),
-    tag.ul(
+    RJNA.tag.ul(
         { class: "todo-list" },
         {},
         {},
