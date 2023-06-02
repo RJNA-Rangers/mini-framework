@@ -30,7 +30,7 @@ export function getFromLocalStorage(todoArray) {
                             "onclick": (evt) => {
                                 let [_, index] = nodeIndex(evt)
                                 orbital.todo[index].completed = !orbital.todo[index].completed
-                                RJNA.update(createTodo())
+                                RJNA.update(createTodo(orbital.todo))
                             }
                         },
                         {
@@ -93,7 +93,7 @@ export function insertIntoLocalStorage(evt) {
                 completed: false,
             }
             orbital.todo.push(new_todo_obj);
-            RJNA.update(createTodo())
+            RJNA.update(createTodo(orbital.todo))
             evt.target.value = ""
             return
         }
@@ -118,7 +118,7 @@ const keyPressed = (evt) => {
             orbital.todo[index]["content"] = evt.target.value
             currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
             currentVDom.children.splice((currentVDom.children.length - 1), 1)
-            RJNA.update(createTodo())
+            RJNA.update(createTodo(orbital.todo))
             return
         } else {
             removeFromLocalStorage(evt)
@@ -135,7 +135,7 @@ const keyPressed = (evt) => {
             currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
             currentVDom.children.splice((currentVDom.children.length - 1), 1)
             RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
-            RJNA.update(createTodo())
+            RJNA.update(createTodo(orbital.todo))
         } else {
             window.onclick = () => { };
             removeFromLocalStorage(evt)
@@ -149,7 +149,7 @@ const keyPressed = (evt) => {
 export function removeFromLocalStorage(evt) {
     let [_, index] = nodeIndex(evt);
     orbital.todo.splice(index, 1);
-    RJNA.update(createTodo())
+    RJNA.update(createTodo(orbital.todo))
 }
 
 // returns index of todo in oribital.todo using the evt id

@@ -1,5 +1,6 @@
 import { getFromLocalStorage } from "../storage/functions.js"
 import RJNA from "../rjna/engine.js"
+import { createTodo } from "../main.js"
 
 // main section (todo display)
 export const main_section = (todoArray) => RJNA.tag.section(
@@ -20,7 +21,8 @@ export const main_section = (todoArray) => RJNA.tag.section(
                 } else {
                     todoArray.forEach(todo => todo.completed = false)
                 }
-                RJNA.update()
+                const newApp = createTodo(todoArray)
+                RJNA.update(newApp)
             }
         }
     ),
