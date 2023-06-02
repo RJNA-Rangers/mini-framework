@@ -1,4 +1,5 @@
-import { getSectionObj, changeSectionObj, changeRootEl, createTodo, rootEl } from "../main.js";
+// import { getSectionObj, changeSectionObj, changeRootEl, createTodo, rootEl } from "../main.js";
+import { createTodo } from "../main.js"
 import diff from "./diff.js";
 
 // creates VDOM
@@ -114,7 +115,7 @@ function getObjByTag(obj, value) {
 // applies those changes to real node whilst updating the specified
 // object.
 function replaceParentNode(obj, node, modifiedNode) {
-    let oldSection = JSON.parse(JSON.stringify(getSectionObj()))
+    let oldSection = JSON.parse(JSON.stringify(obj))
     function replaceObject(obj, node, modifiedNode) {
         if (obj === node) {
             Object.assign(obj, modifiedNode);
@@ -128,19 +129,17 @@ function replaceParentNode(obj, node, modifiedNode) {
     }
     replaceObject(obj, node, modifiedNode);
     const patch = diff(oldSection, obj)
-    changeRootEl(patch(rootEl))
-    changeSectionObj(obj)
+    orbital.rootEl = patch(orbital.rootEl)
+    orbital.obj = obj
 }
 
 // updates specified obj in accordance to state changes and apply
 // those changes to the real DOM.
-function update() {
-    const newApp = createTodo()
-    const patch = diff(getSectionObj(), newApp)
-    changeRootEl(patch(rootEl))
-    changeSectionObj(newApp)
+function update(newApp) {
+    const patch = diff(orbital.obj, newApp)
+    orbital.rootEl = patch(orbital.rootEl)
+    orbital.obj = newApp
 }
-
 
 const RJNA = {
     tag,

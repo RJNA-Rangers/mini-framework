@@ -2,20 +2,26 @@
 
 
 ## Overview RJNA
-obj orientated
-once you have html stuff, store in a big obj
+
+RJNA is a mini-framework that provides a set of functions for creating and manipulating a Virtual DOM (VDOM) representation of an HTML structure. The framework emphasizes the use of an object named orbital, which must have the keys obj and rootEl.
+
+The obj key stores the nested object representing the HTML structure, while the rootEl key holds the corresponding real DOM node created from the VDOM. These keys are essential for maintaining the connection between the VDOM and the real DOM.
+
+Orbital also serves as a global variable that not only stores and manages state changes but also acts as a central hub for coordinating and updating the application's user interface, resulting in a smooth and responsive application experience.
+
+## Orbital Structure
+To use RJNA, the orbital object must be structured as follows:
+```javascript
+let orbital = {
+    customKey:customValue
+    rootEl:undefined,
+    obj:undefined
+}
+```
+
+The obj and rootEl key should initially be set to undefined.
 
 ## Function: RJNA.tag[HTMLElement]()
-
-```javascript
-RJNA.tag[HTMLElement](attributes = {}, eventHandlers = {}, properties = {}, ...children)
-returns {
-        tag: HTMLElement,
-        attrs: { ...attributes },
-        property: { ...eventHandlers, ...properties },
-        children,
-    }
-```
 
 The RJNA.tag[HTMLElement] function is used to create a Virtual DOM (VDOM) representation of an HTML element.
 
@@ -91,34 +97,7 @@ console.log(vdom(count));
 ```
 
 ## Function: RJNA.CreateNode()
-``` javascript
-export function createNode(obj) {
-    const result = document.createElement(obj.tag);
-    if (obj.attrs) {
-        for (const [key, value] of Object.entries(obj.attrs)) {
-            result.setAttribute(key, value);
-        }
-    }
 
-    if (obj.children) {
-        for (const child of obj.children) {
-            if (typeof child == "string") {
-                result.appendChild(text(child))
-            } else {
-                result.appendChild(createNode(child));
-            }
-        }
-    }
-
-    if (obj.property) {
-        for (const [key, value] of Object.entries(obj.property)) {
-            result[key] = value
-        }
-    }
-
-    return result;
-}
-```
 The RJNA.createNode() function is used to create a real DOM node based on a Virtual DOM (VDOM) object returned by RJNA.tag.
 
 ### Syntax
@@ -148,24 +127,7 @@ console.log(vdom);
 ```
 
 ## Function: RJNA.getObjByAttrsAndPropVal()
-```javascript
-function getObjByAttrsAndPropsVal(obj, value) {
-    const result = [];
-    function searchInObject(obj, parent) {
-        for (const prop in obj) {
-            const currentValue = obj[prop];
-            if (typeof currentValue === 'object') {
-                searchInObject(currentValue, obj, prop);
-            } else if (currentValue === value) {
-                if (prop != "tag")
-                    result.push(parent);
-            }
-        }
-    }
-    searchInObject(obj, null, null);
-    return [result, JSON.parse(JSON.stringify(result))];
-}
-```
+
 The getObjByAttrsAndPropsVal() function is used to search for objects within a nested object structure that contain a specific value in their attributes or properties.
 
 ### Syntax
@@ -255,26 +217,7 @@ console.log(deepCopy);
 
 
 ## RJNA.getObjByTag()
-```javascript
-function getObjByTag(obj, value) {
-    const result = [];
-    function searchInObject(obj) {
-        for (const prop in obj) {
-            const currentValue = obj[prop];
-            if (typeof currentValue === 'object') {
-                searchInObject(currentValue, obj, prop);
-            } else if (currentValue === value) {
-                if (prop === "tag") {
-                    result.push(obj);
-                }
-            }
-        }
-    }
 
-    searchInObject(obj, null, null);
-    return [result, JSON.parse(JSON.stringify(result))];
-}
-```
 The getObjByTag function is used to search for objects within a nested object structure that contain a specific value in their tag.
 
 ### Syntax
@@ -336,9 +279,167 @@ console.log(deepCopy);
 ]
 ```
 
-## RJNA.replaceParentNode
+## Function: RJNA.replaceParentNode
+The replaceParentNode() function is used to replace a specific node within a nested object structure (following the format returned by RJNA.tag) with a modified node and apply those changes to the real DOM.
 
-## RJNA.update
+### Syntax
+```javascript
+replaceParentNode(obj, node, modifiedNode)
+```
+
+### Parameters
+- obj: The original nested object representing the HTML structure.
+- node: The node within the obj that needs to be replaced.
+- modifiedNode: The modified node that will replace the node.
+
+### Example:
+```javascript
+const obj = {
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: ['Hello, World!']
+        },
+        {
+            tag: 'p',
+            children: ['Lorem ipsum dolor sit amet']
+        }
+    ]
+};
+console.log(obj)
+console.log(orbital.rootEl)
+orbital.rootEl=RJNA.createNode(obj)
+const [oldNode, newNode] = RJNA.getObjByTag("p");
+newNode.children[0]="Modified content"
+
+replaceParentNode(obj, oldNode, newNode);
+console.log(orbital.rootEl)
+console.log(obj);
+```
+Before:
+```javascript
+{
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: ['Hello, World!']
+        },
+        {
+            tag: 'p',
+            children: ['Lorem ipsum dolor sit amet']
+        }
+    ]
+}
+```
+```php
+<div class="container">
+    <h1>Hello, World!</h1>
+    <p>Lorem ipsum dolor sit amet</p>
+</div>
+```
+After:
+```javascript
+{
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: ['Hello, World!']
+        },
+        {
+            tag: 'p',
+            children: ['Modified content']
+        }
+    ]
+}
+```
+```php
+<div class="container">
+    <h1>Hello, World!</h1>
+    <p>Modified Content</p>
+</div>
+```
+
+## Function: RJNA.update(obj)
+The update() function is used to update the current VDOM with modified VDOM when there is a change in state and apply those changes to the real DOM.
+
+### Syntax
+```javascript
+update(obj)
+```
+
+### Parameters
+- obj: The modified nested object representing the HTML structure.
+
+### Example:
+```javascript
+let count=1
+const obj =(count)=> {
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: `${count}`
+        },
+        {
+            tag: 'p',
+            children: 'Lorem ipsum dolor sit amet'
+        }
+    ]
+};
+orbital.obj=obj(count)
+orbital.rootEl=RJNA.createNode(obj(count))
+console.log(oribtal.obj);
+count++
+RJNA.update(obj(count))
+console.log(orbital.obj)
+```
+Before:
+```javascript
+{
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: "1"
+        },
+        {
+            tag: 'p',
+            children: 'Lorem ipsum dolor sit amet'
+        }
+    ]
+}
+```
+```php
+<div class="container">
+    <h1>1</h1>
+    <p>Lorem ipsum dolor sit amet</p>
+</div>
+```
+After:
+```javascript
+{
+    tag: 'div',
+    children: [
+        {
+            tag: 'h1',
+            children: "2"
+        },
+        {
+            tag: 'p',
+            children: 'Lorem ipsum dolor sit amet'
+        }
+    ]
+}
+```
+```php
+<div class="container">
+    <h1>2</h1>
+    <p>Modified Content</p>
+</div>
+```
 
 
 ## Authors:

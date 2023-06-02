@@ -1,5 +1,6 @@
+import { createTodo } from "../main.js";
 import RJNA from "../rjna/engine.js"
-import { getSectionObj } from "../main.js";
+// import { getSectionObj } from "../main.js";
 
 // creates and returns an array of li tags from array of todos
 export function getFromLocalStorage(todoArray) {
@@ -29,7 +30,7 @@ export function getFromLocalStorage(todoArray) {
                             "onclick": (evt) => {
                                 let [_, index] = nodeIndex(evt)
                                 orbital.todo[index].completed = !orbital.todo[index].completed
-                                RJNA.update()
+                                RJNA.update(createTodo())
                             }
                         },
                         {
@@ -44,21 +45,22 @@ export function getFromLocalStorage(todoArray) {
                                 // if you want the returned array, remoe the [] from the variable (i.e. oldVDOM=[]).
                                 // else it will return the first element of the returned array (in our case
                                 // the first elements of each respective array, i.e [oldVDOM]=arr1[0], [currentvDOM]=arr2[0])
-                                const [[oldVDom], [currentVDom]] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), todo.id);
+                                const [[oldVDom], [currentVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, todo.id);
                                 currentVDom.attrs["class"] = currentVDom.attrs["class"] += " editing"
                                 currentVDom.children.push(RJNA.tag.input({ class: "edit", focusVisible: "true" }, { onkeydown: (evt) => keyPressed(evt) }, { value: `${evt.target.innerHTML}`, autofocus: true }))
-                                RJNA.replaceParentNode(getSectionObj(), oldVDom, currentVDom)
+                                RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
                                 window.onclick = (evt2) => {
                                     if (evt2.target.className == "edit") {
-                                        console.log("touch")
                                         return;
                                     }
+                                    const [[oldVDom], [currentVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, todo.id);
                                     currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
                                     currentVDom.children.splice((currentVDom.children.length - 1), 1)
-                                    RJNA.replaceParentNode(getSectionObj(), oldVDom, currentVDom)
+                                    RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
                                     window.onclick = () => { };
                                     return
                                 }
+
                             }
                         },
                         {},
@@ -91,7 +93,7 @@ export function insertIntoLocalStorage(evt) {
                 completed: false,
             }
             orbital.todo.push(new_todo_obj);
-            RJNA.update()
+            RJNA.update(createTodo())
             evt.target.value = ""
             return
         }
@@ -104,11 +106,11 @@ const keyPressed = (evt) => {
     window.onclick = () => { };
     const id = evt.target.closest("li").dataset.id
     let index = orbital.todo.findIndex(todo => todo.id === id)
-    const [[oldVDom], [currentVDom]] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), evt.target.closest("li").dataset.id);
+    const [[oldVDom], [currentVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, evt.target.closest("li").dataset.id);
     if (evt.key == "Escape") {
         currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
         currentVDom.children.splice((currentVDom.children.length - 1), 1)
-        RJNA.replaceParentNode(getSectionObj(), oldVDom, currentVDom)
+        RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
         return
     }
     if (evt.key == "Enter" || evt.key == "Alt" || evt.key == "Tab") {
@@ -116,7 +118,7 @@ const keyPressed = (evt) => {
             orbital.todo[index]["content"] = evt.target.value
             currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
             currentVDom.children.splice((currentVDom.children.length - 1), 1)
-            RJNA.update()
+            RJNA.update(createTodo())
             return
         } else {
             removeFromLocalStorage(evt)
@@ -132,7 +134,8 @@ const keyPressed = (evt) => {
             orbital.todo[index]["content"] = evt.target.value
             currentVDom.attrs["class"] = currentVDom.attrs["class"].replace("editing", "")
             currentVDom.children.splice((currentVDom.children.length - 1), 1)
-            RJNA.update()
+            RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
+            RJNA.update(createTodo())
         } else {
             window.onclick = () => { };
             removeFromLocalStorage(evt)
@@ -146,7 +149,7 @@ const keyPressed = (evt) => {
 export function removeFromLocalStorage(evt) {
     let [_, index] = nodeIndex(evt);
     orbital.todo.splice(index, 1);
-    RJNA.update()
+    RJNA.update(createTodo())
 }
 
 // returns index of todo in oribital.todo using the evt id
