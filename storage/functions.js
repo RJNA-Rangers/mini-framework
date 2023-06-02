@@ -150,7 +150,7 @@ export function removeFromLocalStorage(evt) {
 }
 
 // returns index of todo in oribital.todo using the evt id
-function nodeIndex(evt) {
+export function nodeIndex(evt) {
     let node = evt.target.parentNode.parentNode
     let id = node.dataset.id
     let indexOfTodo = orbital.todo.findIndex(todo => todo.id === id)

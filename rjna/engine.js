@@ -114,7 +114,7 @@ function getObjByTag(obj, value) {
 // applies those changes to real node whilst updating the specified
 // object.
 function replaceParentNode(obj, node, modifiedNode) {
-    let oldSection = JSON.parse(JSON.stringify(getSectionObj()))
+    let oldSection = JSON.parse(JSON.stringify(obj))
     function replaceObject(obj, node, modifiedNode) {
         if (obj === node) {
             Object.assign(obj, modifiedNode);
