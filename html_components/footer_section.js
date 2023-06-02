@@ -52,25 +52,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("").length - 1] == "#" ? "selected" : window.location.href.split("/")[window.location.href.split("/").length - 1] == "" ? "selected" : "",
     },
       {
-        onclick: () => {
-          // re page as orbital.todo will nly contain
-          // !todo.completed
-          const newApp = RJNA.tag.section({
-            "class": "todoapp",
-          },
-            {},
-            {},
-            todo_header,
-            main_section(orbital.todo),
-            footer_section(orbital.todo),
-          )
-          const patch = diff(orbital.obj, newApp)
-          orbital.rootEl = patch(orbital.rootEl)
-          orbital.obj = newApp
-
-          // get ul children from section obj(li's)
-          // input checked (on click function), will re render page as todo is chasnged
-        }
+        onclick:()=>router.routes[""]()
       },
       {},
       "All")
@@ -84,46 +66,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "active" ? "selected" : ""
     },
       {
-        onclick: (evt) => {
-          // re page as orbital.todo will nly contain
-          // !todo.completed
-          const oldSection = JSON.parse(JSON.stringify(orbital.obj))
-          const [oldSelectedVDom, currentSelectedVDom] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, "selected");
-          console.log(oldSelectedVDom)
-          // currentSelectedVDom.attrs["class"]=currentSelectedVDom.attrs["class"].replace("selected", " ")
-          // const [[oldActiveVDom], [currentActiveVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, "#/active");
-          // currentActiveVDom.attrs["class"]="selected"
-          // console.log(orbital)
-          // orbital.todo.forEach(todo => {
-          //   const [[oldLiVDom], [currentLiVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, todo.id);
-          //   // console.log(oldLiVDom)
-
-          // });
-          // const newApp = RJNA.replaceParentNode(orbital.obj, oldVDom, currentVDom)
-
-          const [oldLiVDom, currentLiVDom] = RJNA.getObjByTag(orbital.obj, "li");
-          // get all toggle class lis
-          // "change the onclick function"
-
-
-          console.log(oldLiVDom)
-          let todo = orbital.todo.filter(todo => !todo.completed);
-          const newApp = RJNA.tag.section({
-            "class": "todoapp",
-          },
-            {},
-            {},
-            todo_header,
-            main_section(todo),
-            footer_section(todo),
-          )
-          // inside new newApp, get selected RJNA.tag and 
-          const patch = diff(orbital.obj, newApp)
-          orbital.rootEl = patch(orbital.rootEl)
-          orbital.obj = newApp
-          // get ul children from section obj(li's)
-          // input checked (on click function), will re render page as todo is chasnged
-        }
+        onclick:()=>router.routes["active"]()
       },
       {},
       "Active"
@@ -138,25 +81,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "completed" ? "selected" : ""
     },
       {
-        onclick: () => {
-          // re page as orbital.todo will nly contain
-          // todo.completed
-          let todo = orbital.todo.filter(todo => todo.completed);
-          const newApp = RJNA.tag.section({
-            "class": "todoapp",
-          },
-            {},
-            {},
-            todo_header,
-            main_section(todo),
-            footer_section(todo),
-          )
-          const patch = diff(orbital.obj, newApp)
-          orbital.rootEl = patch(orbital.rootEl)
-          orbital.obj = newApp
-          // get ul children from section obj(li's)
-          // input checked (on click function), will re render page as todo is chasnged
-        }
+        onclick:()=>router.routes["completed"]()
       },
       {},
       "Completed")
@@ -166,7 +91,7 @@ const todo_filters = RJNA.tag.ul(
 export const footer_section = (count) => RJNA.tag.footer(
   {
     class: "footer",
-    style: count.length ? "display: block;" : "display: none;",
+    style: orbital.todo.length ? "display: block;" : "display: none;",
   },
   {},
   {},
@@ -176,7 +101,7 @@ export const footer_section = (count) => RJNA.tag.footer(
     },
     {},
     {},
-    RJNA.tag.strong({}, {}, {}, (count.length - count.filter(todo => todo.completed).length).toString()),
+    RJNA.tag.strong({}, {}, {}, (orbital.todo.filter(todo => !todo.completed).length).toString()),
     " items left ",
   ),
   todo_filters,
