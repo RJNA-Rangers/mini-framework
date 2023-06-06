@@ -72,15 +72,54 @@ export function text(input) {
 // of the input object and returns two identical arrays [untouch, toModify]
 // of the parent objs that match the input value
 function getObjByAttrsAndPropsVal(obj, value) {
-    const result = [];
+const result = [];
     function searchInObject(obj, parent) {
         for (const prop in obj) {
             const currentValue = obj[prop];
             if (typeof currentValue === 'object') {
-                searchInObject(currentValue, obj, prop);
+                searchInObject(currentValue, obj);
             } else if (currentValue === value) {
                 if (prop != "tag")
-                    result.push(parent);
+                result.push(parent);
+            }
+        }
+    }
+    searchInObject(obj, null, null);
+    return [result, JSON.parse(JSON.stringify(result))];
+}
+
+
+//renders any immediate changes that should be made upon calling getObjByAttrsAndPropsVal
+//if no renders need to be made upon it's initial call use getObjByAttrsAndPropsVal
+function render(obj, value, propertyName, newValue, children) {
+    const result = [];
+    let propOrAttr = '';
+    function searchInObject(object, parent) {
+        for (const prop in object) {
+            const currentValue = object[prop];
+            if (typeof currentValue === 'object') {
+                propOrAttr = prop.toString();
+                searchInObject(currentValue, object);
+            } else if (currentValue === value) {
+                if (prop != "tag")
+                result.push(parent);
+                //update parent's object properties or attributes with new values if they exist
+                let newParent = JSON.parse(JSON.stringify(parent));
+                let newObj = JSON.parse(JSON.stringify(object));
+                if(newValue !== undefined && propertyName !==undefined)
+                if (Array.isArray(children)){
+                    children.forEach(child => newParent.children.push(child))
+                }
+                //if the value needs to concat on a previous value...
+                if (typeof newValue == 'string' && newValue.slice(0,2) == "+="){
+                    newObj[propertyName] += newValue.slice(2);
+                }else if (typeof newValue == 'string' && newValue.slice(0,2) == "-="){
+                    newObj[propertyName] -= newValue.slice(2);
+                }else{
+                    newObj[propertyName] = newValue;
+                }
+                newParent[propOrAttr] = newObj;
+                replaceParentNode(obj, parent, newParent);
             }
         }
     }
@@ -149,7 +188,8 @@ const RJNA = {
     getObjByAttrsAndPropsVal,
     replaceParentNode,
     getObjByTag,
-    update
+    update,
+    render
 };
 
 export default RJNA
