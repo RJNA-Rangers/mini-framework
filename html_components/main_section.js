@@ -4,7 +4,7 @@ import { createTodo } from "../main.js"
 
 // main section (todo display)
 export const main_section = (todoArray) => RJNA.tag.section(
-    { class: "main", style: todoArray.length ? "display: block;" : "display: none;" },
+    { class: "main", style: orbital.todo.length ? "display: block;" : "display: none;" },
     {},
     {},
     RJNA.tag.input(
@@ -15,14 +15,23 @@ export const main_section = (todoArray) => RJNA.tag.section(
         },
         {
             onclick: (evt) => {
-                todoArray.filter(todo => todo.completed).length
-                if (todoArray.filter(todo => todo.completed).length < todoArray.length) {
-                    todoArray.forEach(todo => todo.completed = true)
+                console.log(orbital.todo.filter(todo => todo.completed).length)
+                if (orbital.todo.filter(todo => todo.completed).length < orbital.todo.length) {
+                    orbital.todo.forEach(todo => todo.completed = true)
                 } else {
-                    todoArray.forEach(todo => todo.completed = false)
+                    orbital.todo.forEach(todo => todo.completed = false)
                 }
-                const newApp = createTodo(todoArray)
-                RJNA.update(newApp)
+                switch (window.location.href.split('/').at(-1)) {
+                    case "active":
+                        router.routes["active"]()
+                        break
+                    case "completed":
+                        router.routes["completed"]()
+                        break
+                    case "":
+                        router.routes[""]()
+                        break
+                }
             }
         }
     ),

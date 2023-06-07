@@ -3,6 +3,7 @@ import { main_section } from "./main_section.js";
 import { todo_header } from "./todo_header.js";
 // import { getSectionObj, changeRootEl, changeSectionObj, rootEl } from "../main.js";
 import diff from "../rjna/diff.js";
+import { createTodo } from "../main.js";
 
 // footer section
 const todo_clear_completed = (count) => RJNA.tag.button(
@@ -18,18 +19,7 @@ const todo_clear_completed = (count) => RJNA.tag.button(
     {
       onclick: () => {
         orbital.todo = orbital.todo.filter(todo => !todo.completed);
-        const newApp = RJNA.tag.section({
-          "class": "todoapp",
-        },
-          {},
-          {},
-          todo_header,
-          main_section(orbital.todo),
-          footer_section(orbital.todo),
-        )
-        const patch = diff(orbital.obj, newApp)
-        orbital.rootEl = patch(orbital.rootEl)
-        orbital.obj = newApp
+        RJNA.update(createTodo(orbital.todo))
       },
     },
     {},
@@ -52,7 +42,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("").length - 1] == "#" ? "selected" : window.location.href.split("/")[window.location.href.split("/").length - 1] == "" ? "selected" : "",
     },
       {
-        onclick:()=>router.routes[""]()
+        onclick: () => router.routes[""]()
       },
       {},
       "All")
@@ -66,7 +56,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "active" ? "selected" : ""
     },
       {
-        onclick:()=>router.routes["active"]()
+        onclick: () => router.routes["active"]()
       },
       {},
       "Active"
@@ -81,7 +71,7 @@ const todo_filters = RJNA.tag.ul(
       class: window.location.href.split("/")[window.location.href.split("/").length - 1] == "completed" ? "selected" : ""
     },
       {
-        onclick:()=>router.routes["completed"]()
+        onclick: () => router.routes["completed"]()
       },
       {},
       "Completed")

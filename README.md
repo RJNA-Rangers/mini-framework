@@ -75,14 +75,31 @@ console.log(vdom);
 
 ### Example with State:
 ```javascript
-const count=1
+let count=1
 const vdom = (args)=> RJNA.tag.div({ class: `${args}` }, {}, {}, RJNA.tag.h1({class: args.length ?'empty':'full' }, {}, {}, 'Hello, World!'));
+console.log(vdom(count));
+count++
+vdom(count)
 console.log(vdom(count));
 ```
 ```css
 {
     tag: 'div',
     attrs: { class: '1' },
+    property: {},
+    children: [
+        {
+            tag: 'h1',
+            attrs: {class:'full'},
+            property: {},
+            children: ['Hello, World!']
+        }
+    ]
+}
+
+{
+    tag: 'div',
+    attrs: { class: '2' },
     property: {},
     children: [
         {

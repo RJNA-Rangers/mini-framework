@@ -4,12 +4,62 @@ import diff from "./diff.js";
 
 // creates VDOM
 function createElement(tag, attributes = {}, eventHandlers = {}, properties = {}, ...children) {
-    return {
+    const element = {
         tag,
-        "attrs": { ...attributes },
-        "property": { ...eventHandlers, ...properties },
+        attrs: { ...attributes },
+        property: { ...eventHandlers, ...properties },
         children,
-    }
+    };
+
+    // Custom methods
+    // change tag
+    element.setTag = function (newTag) {
+        const oldVDOM = JSON.parse(JSON.stringify(element))
+        element.tag = newTag;
+        replaceParentNode(orbital.obj, oldVDOM, element)
+        return Element
+    };
+
+    // attributes
+
+    // add/change attributes
+    element.setAttr = function (key, val) {
+        const oldVDOM = JSON.parse(JSON.stringify(element))
+        if (element.attrs.hasOwnProperty(key)) {
+            element.attrs[key] += " " + val
+
+        } else {
+            element.attrs[key] = val;
+        }
+        replaceParentNode(orbital.obj, oldVDOM, element)
+        return element
+    };
+
+    // properties
+
+    // add/change properties
+    element.setProp = function (key, val) {
+        const oldVDOM = JSON.parse(JSON.stringify(element))
+        element.property[key] = val;
+        replaceParentNode(orbital.obj, oldVDOM, element)
+        return element
+    };
+
+    // children
+
+    // add child
+    element.setChild = function (...obj) {
+        const newVDOM = JSON.parse(JSON.stringify(element)); // Create a deep copy of element
+        const newChildren = [...element.children, ...obj]
+        newVDOM.children = newChildren
+        replaceParentNode(orbital.obj, element, newVDOM);
+        console.log(orbital.obj, "ororororor")
+        return element
+    };
+
+    // remove VDOM
+
+    return element;
 }
 
 // all html tags
@@ -74,11 +124,20 @@ export function text(input) {
 // of the parent objs that match the input value
 function getObjByAttrsAndPropsVal(obj, value) {
     const result = [];
+    console.log(obj)
     function searchInObject(obj, parent) {
         for (const prop in obj) {
+            console.log({ prop }, obj[prop])
             const currentValue = obj[prop];
             if (typeof currentValue === 'object') {
                 searchInObject(currentValue, obj, prop);
+
+            } else if (typeof currentValue === 'string') {
+                if (currentValue.split(" ").includes(value)) {
+                    if (prop != "tag")
+                        result.push(parent);
+
+                }
             } else if (currentValue === value) {
                 if (prop != "tag")
                     result.push(parent);

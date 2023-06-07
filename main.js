@@ -3,7 +3,6 @@ import { todo_header } from "./html_components/todo_header.js";
 import { main_section } from "./html_components/main_section.js";
 import { footer_section } from "./html_components/footer_section.js";
 import { footerInfo } from "./html_components/footer_info.js";
-import diff from "./rjna/diff.js";
 import { nodeIndex } from "./storage/functions.js"
 
 export function createTodo(todo) {
@@ -24,7 +23,7 @@ window.onload = () => {
             let [[oldSelectedVDom], [currentSelectedVDom]] = RJNA.getObjByAttrsAndPropsVal(activeApp, "selected");
             currentSelectedVDom.attrs["class"] = currentSelectedVDom.attrs["class"].replace("selected", " ")
             RJNA.replaceParentNode(activeApp, oldSelectedVDom, currentSelectedVDom)
-            let [[oldActiveVDom], [currentActiveVDom]] = RJNA.getObjByAttrsAndPropsVal(getSectionObj(), "#/active");
+            let [[oldActiveVDom], [currentActiveVDom]] = RJNA.getObjByAttrsAndPropsVal(activeApp, "#/active");
             currentActiveVDom.attrs["class"] = "selected"
             RJNA.replaceParentNode(activeApp, oldActiveVDom, currentActiveVDom)
             let [oldActiveLi, currentActiveLi] = RJNA.getObjByAttrsAndPropsVal(activeApp, "toggle");
@@ -99,6 +98,7 @@ router.routes = {
         const [[oldActiveVDom], [currentActiveVDom]] = RJNA.getObjByAttrsAndPropsVal(orbital.obj, "#/");
         currentActiveVDom.attrs["class"] = "selected"
         RJNA.replaceParentNode(newApp, oldActiveVDom, currentActiveVDom)
+        orbital.obj = newApp
     },
     'active': () => {
         let todo = orbital.todo.filter(todo => !todo.completed);
@@ -120,6 +120,7 @@ router.routes = {
             RJNA.replaceParentNode(newApp, oldActiveLi[index], input)
             console.log(input.property.onclick)
         })
+        orbital.obj = newApp
     },
     'completed': () => {
         let todo = orbital.todo.filter(todo => todo.completed);
@@ -141,6 +142,7 @@ router.routes = {
             RJNA.replaceParentNode(newApp, oldCompletedLi[index], input)
             console.log(input.property.onclick)
         })
+        orbital.obj = newApp
     },
 }
 
