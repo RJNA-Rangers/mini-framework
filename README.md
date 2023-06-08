@@ -50,6 +50,25 @@ attrs: An object containing the attributes of the HTML element.
 property: An object containing the event handlers and properties of the HTML element.
 children: An array containing the child elements of the HTML element.
 
+## Custom Methods 
+Custom Methods
+
+The created element object has the following custom methods available for manipulating the element:
+
+- setTag(newTag): Changes the tag name of the element. It accepts a new tag name as a parameter and replaces the current tag name of the element. Returns the modified element object.
+    
+- setAttr(key, val): Adds or changes an attribute of the element. It accepts the attribute key and value as parameters and updates the corresponding attribute of the element. If the attribute already exists, the new value is appended to the existing value. Returns the modified element object.
+    
+- removeAttr(key, val, replaceVal): Removes an attribute from the element. It accepts the attribute key as a parameter and removes the attribute from the element. If the optional val parameter is provided, it replaces the specified value within the attribute with the replaceVal. Returns the modified element object.
+   
+- setProp(key, val): Adds or changes a property of the element. It accepts the property key and value as parameters and updates the corresponding property of the element. Returns the modified element object.
+
+- removeProp(key, val): Removes or changes a property of the element. It accepts the property key as a parameter and removes the property from the element. If the optional val parameter is provided, it replaces the specified value within the property. Returns the modified element object.
+    
+- setChild(...obj): Adds one or more child elements or text nodes to the element. It accepts multiple parameters, which are treated as separate child nodes appended to the element. Returns the modified element object.
+
+- removeChildren(index, deleteCount): Removes a range of children from the element. It accepts the starting index and the number of children to be removed. Returns the modified element object.
+
 ### Example without State:
 ```javascript
 const vdom = RJNA.tag.div({ class: 'container' }, {}, {}, RJNA.tag.h1({}, {}, {}, 'Hello, World!'));
@@ -112,6 +131,60 @@ console.log(vdom(count));
 }
 
 ```
+### Example with custom methods: 
+```javascript
+const vdom = (args)=> {
+    let div = RJNA.tag.div({ class: `${args}` }, {}, {}, RJNA.tag.h1({class: args.length ?'empty':'full' }, {}, {}, 'Hello, World!'))
+    console.log(div);
+    div.setAttr("class", "main-div")
+    div.setProp("onclick", (evt)=>{console.log('div clicked.')})
+    div.setChild(RJNA.tag.h1({},{},{},"I am the child of the div!"))
+    console.log(div);
+    div.removeChildren(div.children.length-1, 1);
+    div.removeAttr("class", "1 main-div", "main-div");
+    console.log(div);
+    div.removeProp("onclick", "");
+}
+```
+```css
+{
+    tag: 'div',
+    attrs: { class: 'full' },
+    property: {},
+    children: ['Hello, World!']
+}
+
+{
+    tag: 'div',
+    attrs: { class: 'full main-div' },
+    property: {"onclick": (evt)=>{console.log('div clicked')}},
+    children: 
+    [
+        'Hello, World!', 
+        {
+            tag: 'h1',
+            attrs: {},
+            property: {},
+            children: ['I am the child of the div!']
+        }
+    ]
+}
+
+{
+    tag: 'div',
+    attrs: { class: 'full' },
+    property:  {"onclick": (evt)=>{console.log('div clicked')}},
+    children: ['Hello, World!']
+}
+
+{
+    tag: 'div',
+    attrs: { class: 'full' },
+    property:  {"onclick": ""},
+    children: ['Hello, World!']
+}
+
+```
 
 ## Function: RJNA.CreateNode()
 
@@ -145,7 +218,7 @@ console.log(vdom);
 
 ## Function: RJNA.getObjByAttrsAndPropVal()
 
-The getObjByAttrsAndPropsVal() function is used to search for objects within a nested object structure that contain a specific value in their attributes or properties.
+The getObjByAttrsAndPropsVal function is a recursive utility function that searches for objects within a given object hierarchy based on attribute and property values. It traverses through the object's properties and their nested objects to find matches. This function is useful for querying and retrieving specific objects based on their attribute or property values.
 
 ### Syntax
 ```javascript
@@ -157,9 +230,7 @@ getObjByAttrsAndPropsVal(obj, value)
 - value: The value to search for within the attributes or properties of the objects.
 
 ### Returned Value
-- The first element is an array (result) that contains the objects that have the specified value in their attributes or properties.
-- The second element is a deep copy of the result array.
-!! THis will be important for RJNA.replaceParentNode()
+- If the array has only one element, then it returns the object that matches the search criteria. Otherwise, it returns an array of objects that match the search criteria. Each object represents a match found in the provided obj. If no matches are found, an empty array is returned.
 
 ### Example:
 ```javascript
@@ -182,54 +253,18 @@ const vdom = {
         }
     ]
 };
-
-const [result, deepCopy] = getObjByAttrsAndPropsVal(vdom, 'container');
+const result = getObjByAttrsAndPropsVal(vdom, 'paragraph');
 console.log(result);
-console.log(deepCopy);
 ```
 ```yaml
-[
     {
-        tag: 'div',
-        attrs: { class: 'container' },
-        property: {},
-        children: [
-            {
-                tag: 'h1',
-                attrs: {},
-                property: {},
-                children: ['Hello, World!']
-            },
-            {
-                tag: 'p',
-                attrs: { id: 'paragraph' },
-                property: {},
-                children: ['Lorem ipsum']
-            }
-        ]
+        {
+            tag: 'p',
+            attrs: { id: 'paragraph' },
+            property: {},
+            children: ['Lorem ipsum']
+        }
     }
-]
-[
-     {
-        tag: 'div',
-        attrs: { class: 'container' },
-        property: {},
-        children: [
-            {
-                tag: 'h1',
-                attrs: {},
-                property: {},
-                children: ['Hello, World!']
-            },
-            {
-                tag: 'p',
-                attrs: { id: 'paragraph' },
-                property: {},
-                children: ['Lorem ipsum']
-            }
-        ]
-    }
-]
 ```
 
 
@@ -249,7 +284,6 @@ getObjByTag(obj, value)
 ### Returned Value
 - The first element is an array (result) that contains the objects that have the specified value in their tag.
 - The second element is a deep copy of the result array.
-!! THis will be important for RJNA.replaceParentNode()
 
 ### Example:
 ```javascript
@@ -273,9 +307,8 @@ const vdom = {
     ]
 };
 
-const [result, deepCopy] = getObjByTag(vdom, 'p');
+const [result] = getObjByTag(vdom, 'p');
 console.log(result);
-console.log(deepCopy);
 ```
 ```yaml
 [
@@ -286,99 +319,7 @@ console.log(deepCopy);
         children: ['Lorem ipsum']
     }
 ]
-[
-    {
-        tag: 'p',
-        attrs: { id: 'paragraph' },
-        property: {},
-        children: ['Lorem ipsum']
-    }
-]
 ```
-
-## Function: RJNA.replaceParentNode
-The replaceParentNode() function is used to replace a specific node within a nested object structure (following the format returned by RJNA.tag) with a modified node and apply those changes to the real DOM.
-
-### Syntax
-```javascript
-replaceParentNode(obj, node, modifiedNode)
-```
-
-### Parameters
-- obj: The original nested object representing the HTML structure.
-- node: The node within the obj that needs to be replaced.
-- modifiedNode: The modified node that will replace the node.
-
-### Example:
-```javascript
-const obj = {
-    tag: 'div',
-    children: [
-        {
-            tag: 'h1',
-            children: ['Hello, World!']
-        },
-        {
-            tag: 'p',
-            children: ['Lorem ipsum dolor sit amet']
-        }
-    ]
-};
-console.log(obj)
-console.log(orbital.rootEl)
-orbital.rootEl=RJNA.createNode(obj)
-const [oldNode, newNode] = RJNA.getObjByTag("p");
-newNode.children[0]="Modified content"
-
-replaceParentNode(obj, oldNode, newNode);
-console.log(orbital.rootEl)
-console.log(obj);
-```
-Before:
-```javascript
-{
-    tag: 'div',
-    children: [
-        {
-            tag: 'h1',
-            children: ['Hello, World!']
-        },
-        {
-            tag: 'p',
-            children: ['Lorem ipsum dolor sit amet']
-        }
-    ]
-}
-```
-```php
-<div class="container">
-    <h1>Hello, World!</h1>
-    <p>Lorem ipsum dolor sit amet</p>
-</div>
-```
-After:
-```javascript
-{
-    tag: 'div',
-    children: [
-        {
-            tag: 'h1',
-            children: ['Hello, World!']
-        },
-        {
-            tag: 'p',
-            children: ['Modified content']
-        }
-    ]
-}
-```
-```php
-<div class="container">
-    <h1>Hello, World!</h1>
-    <p>Modified Content</p>
-</div>
-```
-
 ## Function: RJNA.update(obj)
 The update() function is used to update the current VDOM with modified VDOM when there is a change in state and apply those changes to the real DOM.
 
