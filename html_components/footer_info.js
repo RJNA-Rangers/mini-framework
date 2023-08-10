@@ -33,12 +33,6 @@ export const footerInfo = RJNA.tag.footer(
             " Jason Asante, "
         ),
         RJNA.tag.a({
-            href: "https://github.com/nik-don",
-        },
-            {},
-            {},
-            " Nikolo Don, "),
-        RJNA.tag.a({
             href: "https://github.com/AbdKhan1",
         },
             {},
