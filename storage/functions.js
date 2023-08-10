@@ -79,7 +79,7 @@ export function getFromLocalStorage(todoArray) {
       )
     )
   );
-  return todo_arr.reverse();
+  return todo_arr;
 }
 
 // inserts newly entered todo into orbital.todo and
