@@ -403,5 +403,4 @@ After:
 ## Authors:
 - Remi
 - Jason
-- Nik
 - Abdul Raheem Khan
